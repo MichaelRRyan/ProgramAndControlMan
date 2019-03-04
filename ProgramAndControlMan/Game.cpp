@@ -3,10 +3,11 @@
 #include "Game.h"
 
 Game::Game() :
-	m_window{ sf::VideoMode{ 800u, 600u, 32u }, "Basic Game" },
+	m_window{ sf::VideoMode{ 800u, 800u, 32u }, "Basic Game" },
 	m_exitGame{ false }
 {
-	setupShapes();
+	setupMaze();
+	setupGame();
 }
 
 Game::~Game()
@@ -58,14 +59,52 @@ void Game::render()
 {
 	m_window.clear();
 
-	m_window.draw(m_circle);
+	drawMaze();
 
 	m_window.display();
 }
 
-void Game::setupShapes()
+void Game::setupGame()
 {
-	m_circle.setFillColor(sf::Color::Red);
-	m_circle.setRadius(30.0f);
-	m_circle.setPosition(400.0f, 300.0f);
+	for (int row = 0; row < MAX_ROWS; row++)
+	{
+		for (int col = 0; col < MAX_COLS; col++)
+		{
+			if (!m_maze[row][col].getContainsWall())
+			{
+				m_player.setPos({ row, col });
+			}
+		}
+	}
+}
+
+void Game::setupMaze()
+{
+	for (int row = 0; row < MAX_ROWS; row++)
+	{
+		for (int col = 0; col < MAX_COLS; col++)
+		{
+			if (rand() % 5 == 0)
+			{
+				m_maze[row][col].setContainsWall(true);
+			}
+			else
+			{
+				m_maze[row][col].setContainsCoin(true);
+			}
+			m_maze[row][col].setPosition({ 32.0f * row, 32.0f * col }); // Sets the position based on the row and column
+		}
+	}
+}
+
+void Game::drawMaze()
+{
+	for (int row = 0; row < MAX_ROWS; row++)
+	{
+		for (int col = 0; col < MAX_COLS; col++)
+		{
+			m_window.draw(m_maze[row][col].getBody());
+		}
+	}
+	m_window.draw(m_player.getBody());
 }
