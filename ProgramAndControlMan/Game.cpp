@@ -44,6 +44,7 @@ void Game::processEvents()
 		{
 			m_window.close();
 		}
+		m_player.move(checkMovementInput(nextEvent), m_maze);
 	}
 }
 
@@ -60,20 +61,29 @@ void Game::render()
 	m_window.clear();
 
 	drawMaze();
+	m_window.draw(m_player.getBody());
 
 	m_window.display();
 }
 
 void Game::setupGame()
 {
+	bool found = false;
 	for (int row = 0; row < MAX_ROWS; row++)
 	{
 		for (int col = 0; col < MAX_COLS; col++)
 		{
 			if (!m_maze[row][col].getContainsWall())
 			{
-				m_player.setPos({ row, col });
+				m_player.setPos({ col, row });
+				m_maze[row][col].setContainsCoin(false);
+				found = true;
+				break;
 			}
+		}
+		if (found)
+		{
+			break;
 		}
 	}
 }
@@ -88,11 +98,15 @@ void Game::setupMaze()
 			{
 				m_maze[row][col].setContainsWall(true);
 			}
+			else if (row == 0 || row == MAX_ROWS - 1 || col == 0 || col == MAX_COLS - 1)
+			{
+				m_maze[row][col].setContainsWall(true);
+			}
 			else
 			{
 				m_maze[row][col].setContainsCoin(true);
 			}
-			m_maze[row][col].setPosition({ 32.0f * row, 32.0f * col }); // Sets the position based on the row and column
+			m_maze[row][col].setPosition({ 32.0f * col, 32.0f * row }); // Sets the position based on the row and column
 		}
 	}
 }
@@ -103,8 +117,39 @@ void Game::drawMaze()
 	{
 		for (int col = 0; col < MAX_COLS; col++)
 		{
-			m_window.draw(m_maze[row][col].getBody());
+			if (m_maze[row][col].getContainsCoin() || m_maze[row][col].getContainsWall())
+			{
+				m_window.draw(m_maze[row][col].getBody());
+			}
 		}
 	}
-	m_window.draw(m_player.getBody());
+}
+
+Direction Game::checkMovementInput(sf::Event t_nextEvent)
+{
+	if (t_nextEvent.type == sf::Event::KeyPressed)
+	{
+		if (t_nextEvent.key.code == sf::Keyboard::Left)
+		{
+			return Direction::West;
+		}
+		if (t_nextEvent.key.code == sf::Keyboard::Right)
+		{
+			return Direction::East;
+		}
+		if (t_nextEvent.key.code == sf::Keyboard::Left)
+		{
+			return Direction::West;
+		}
+		if (t_nextEvent.key.code == sf::Keyboard::Up)
+		{
+			return Direction::North;
+		}
+		if (t_nextEvent.key.code == sf::Keyboard::Down)
+		{
+			return Direction::South;
+		}
+	}
+
+	return Direction::None;
 }

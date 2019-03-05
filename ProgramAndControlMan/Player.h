@@ -11,6 +11,7 @@ class Player
 	sf::Texture m_spriteSheet;
 	sf::Sprite m_body;
 	sf::Vector2i m_pos;
+	int m_score;
 
 public:
 	// Declare public function members
