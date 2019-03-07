@@ -8,6 +8,7 @@ Game::Game() :
 {
 	setupMaze();
 	setupGame();
+	setupFontAndText();
 }
 
 Game::~Game()
@@ -54,6 +55,9 @@ void Game::update(sf::Time t_deltaTime)
 	{
 		m_window.close();
 	}
+
+	m_scoreText.setString("Score: " + std::to_string(m_player.getScore()));
+	m_ghost.move(m_maze);
 }
 
 void Game::render()
@@ -62,6 +66,8 @@ void Game::render()
 
 	drawMaze();
 	m_window.draw(m_player.getBody());
+	m_window.draw(m_scoreText);
+	m_window.draw(m_ghost.getBody());
 
 	m_window.display();
 }
@@ -75,15 +81,15 @@ void Game::setupGame()
 		{
 			if (!m_maze[row][col].getContainsWall())
 			{
-				m_player.setPos({ col, row });
-				m_maze[row][col].setContainsCoin(false);
-				found = true;
-				break;
+				if (!found)
+				{
+					m_player.setPos({ col, row });
+					m_maze[row][col].setContainsCoin(false);
+					found = true;
+				}
+
+				m_ghost.setPos(row, col);
 			}
-		}
-		if (found)
-		{
-			break;
 		}
 	}
 }
@@ -109,6 +115,15 @@ void Game::setupMaze()
 			m_maze[row][col].setPosition({ 32.0f * col, 32.0f * row }); // Sets the position based on the row and column
 		}
 	}
+}
+
+void Game::setupFontAndText()
+{
+	if (!m_arialFont.loadFromFile("ASSETS\\FONTS\\arial.ttf"))
+	{
+		// Error loading font file
+	}
+	m_scoreText.setFont(m_arialFont);
 }
 
 void Game::drawMaze()

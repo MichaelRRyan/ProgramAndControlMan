@@ -7,6 +7,7 @@
 #include "Cell.h"
 #include "Globals.h"
 #include "Player.h"
+#include "WalkerEnemy.h"
 
 class Game
 {
@@ -23,6 +24,7 @@ private:
 	void render();
 	void setupGame();
 	void setupMaze();
+	void setupFontAndText();
 	void drawMaze();
 	Direction checkMovementInput(sf::Event t_nextEvent);
 
@@ -31,6 +33,10 @@ private:
 
 	Cell m_maze[MAX_ROWS][MAX_COLS];
 	Player m_player;
+	WalkerEnemy m_ghost;
+
+	sf::Font m_arialFont;
+	sf::Text m_scoreText;
 };
 
 #endif // !GAME

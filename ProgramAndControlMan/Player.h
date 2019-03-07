@@ -20,6 +20,7 @@ public:
 
 	void setPos(sf::Vector2i t_pos); // Set the row and column position of the player
 	inline sf::Sprite getBody() { return m_body; }
+	inline int getScore() { return m_score; } // Returns the score of the player
 
 	void move(Direction t_direction, Cell t_maze[][MAX_COLS]);
 };
