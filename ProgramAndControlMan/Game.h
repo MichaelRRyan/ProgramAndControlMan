@@ -9,6 +9,9 @@
 #include "Player.h"
 #include "WalkerEnemy.h"
 
+const unsigned MAX_GHOSTS{ 4 };
+enum class GameState{ MenuScreen, HelpScreen, NameScreen, GamePlay, Pause, GameOver };
+
 class Game
 {
 public:
@@ -30,13 +33,16 @@ private:
 
 	sf::RenderWindow m_window;
 	bool m_exitGame;
+	bool m_gameOver;
 
 	Cell m_maze[MAX_ROWS][MAX_COLS];
+	WalkerEnemy m_ghost[MAX_GHOSTS];
 	Player m_player;
-	WalkerEnemy m_ghost;
+	
 
 	sf::Font m_arialFont;
 	sf::Text m_scoreText;
+	sf::Text m_gameOverText;
 };
 
 #endif // !GAME

@@ -12,3 +12,6 @@ enum class Direction
 
 static const int MAX_ROWS{ 25 };
 static const int MAX_COLS{ 25 };
+
+static const unsigned WINDOW_WIDTH{ 800u };
+static const unsigned WINDOW_HEIGHT{ 800u };

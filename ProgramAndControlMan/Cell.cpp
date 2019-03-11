@@ -15,7 +15,7 @@ void Cell::loadFiles()
 	{
 		// Error
 	}
-	if (!coinTexture.loadFromFile("ASSETS\\IMAGES\\bigPill.png"))
+	if (!coinTexture.loadFromFile("ASSETS\\IMAGES\\smallPill.png"))
 	{
 		// Error
 	}

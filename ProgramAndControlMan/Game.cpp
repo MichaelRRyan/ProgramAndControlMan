@@ -45,7 +45,22 @@ void Game::processEvents()
 		{
 			m_window.close();
 		}
-		m_player.move(checkMovementInput(nextEvent), m_maze);
+		if (!m_gameOver)
+		{
+			m_player.move(checkMovementInput(nextEvent), m_maze);
+		}
+		else
+		{
+			if (sf::Event::KeyPressed == nextEvent.type)
+			{
+				if (sf::Keyboard::R == nextEvent.key.code)
+				{
+					setupMaze();
+					setupGame();
+				}
+			}
+		}
+		
 	}
 }
 
@@ -56,8 +71,24 @@ void Game::update(sf::Time t_deltaTime)
 		m_window.close();
 	}
 
-	m_scoreText.setString("Score: " + std::to_string(m_player.getScore()));
-	m_ghost.move(m_maze);
+	if (!m_gameOver)
+	{
+		for (int i = 0; i < MAX_GHOSTS; i++)
+		{
+			if (m_player.getPos() == m_ghost[i].getPos()) // Check if the row and col of a ghost and the player match
+			{
+				m_gameOver = true;
+			}
+		}
+
+		m_scoreText.setString("Score: " + std::to_string(m_player.getScore()));
+
+		for (int i = 0; i < MAX_GHOSTS; i++)
+		{
+			m_ghost[i].move(m_maze);
+		}
+	}
+	
 }
 
 void Game::render()
@@ -66,14 +97,27 @@ void Game::render()
 
 	drawMaze();
 	m_window.draw(m_player.getBody());
+
+	for (int i = 0; i < MAX_GHOSTS; i++)
+	{
+		m_window.draw(m_ghost[i].getBody());
+	}
+
 	m_window.draw(m_scoreText);
-	m_window.draw(m_ghost.getBody());
+
+	if (m_gameOver)
+	{
+		m_window.draw(m_gameOverText);
+	}
 
 	m_window.display();
 }
 
 void Game::setupGame()
 {
+	m_gameOver = false;
+	m_player.setScore(0);
+
 	bool found = false;
 	for (int row = 0; row < MAX_ROWS; row++)
 	{
@@ -88,7 +132,10 @@ void Game::setupGame()
 					found = true;
 				}
 
-				m_ghost.setPos(row, col);
+				for (int i = 0; i < MAX_GHOSTS; i++)
+				{
+					m_ghost[i].setPos(row, col);
+				}
 			}
 		}
 	}
@@ -100,6 +147,10 @@ void Game::setupMaze()
 	{
 		for (int col = 0; col < MAX_COLS; col++)
 		{
+			// Reset all values before setting them
+			m_maze[row][col].setContainsCoin(false);
+			m_maze[row][col].setContainsWall(false);
+
 			if (rand() % 5 == 0)
 			{
 				m_maze[row][col].setContainsWall(true);
@@ -124,6 +175,13 @@ void Game::setupFontAndText()
 		// Error loading font file
 	}
 	m_scoreText.setFont(m_arialFont);
+
+	// Setup the game over text
+	m_gameOverText.setFont(m_arialFont);
+	m_gameOverText.setString("GAME OVER");
+	m_gameOverText.setCharacterSize(50u);
+	m_gameOverText.setOrigin(m_gameOverText.getGlobalBounds().width / 2, m_gameOverText.getGlobalBounds().height / 2);
+	m_gameOverText.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
 }
 
 void Game::drawMaze()
@@ -142,27 +200,40 @@ void Game::drawMaze()
 
 Direction Game::checkMovementInput(sf::Event t_nextEvent)
 {
-	if (t_nextEvent.type == sf::Event::KeyPressed)
+	if (m_player.getCanMove()) // Check that the player can move
 	{
-		if (t_nextEvent.key.code == sf::Keyboard::Left)
+		if (t_nextEvent.type == sf::Event::KeyPressed) // Check if a key is pressed
 		{
-			return Direction::West;
+			m_player.setCanMove(false); // Player can no longer move
+
+			// Get and return the player move direction
+			if (t_nextEvent.key.code == sf::Keyboard::Left)
+			{
+				return Direction::West;
+			}
+			if (t_nextEvent.key.code == sf::Keyboard::Right)
+			{
+				return Direction::East;
+			}
+			if (t_nextEvent.key.code == sf::Keyboard::Left)
+			{
+				return Direction::West;
+			}
+			if (t_nextEvent.key.code == sf::Keyboard::Up)
+			{
+				return Direction::North;
+			}
+			if (t_nextEvent.key.code == sf::Keyboard::Down)
+			{
+				return Direction::South;
+			}
 		}
-		if (t_nextEvent.key.code == sf::Keyboard::Right)
+	}
+	else // If the player can't move
+	{
+		if (t_nextEvent.type == sf::Event::KeyReleased) // If a key was released
 		{
-			return Direction::East;
-		}
-		if (t_nextEvent.key.code == sf::Keyboard::Left)
-		{
-			return Direction::West;
-		}
-		if (t_nextEvent.key.code == sf::Keyboard::Up)
-		{
-			return Direction::North;
-		}
-		if (t_nextEvent.key.code == sf::Keyboard::Down)
-		{
-			return Direction::South;
+			m_player.setCanMove(true); // The player can move again
 		}
 	}
 

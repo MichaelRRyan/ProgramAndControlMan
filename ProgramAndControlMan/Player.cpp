@@ -5,6 +5,7 @@ Player::Player()
 {
 	loadFiles();
 	m_score = 0;
+	m_canMove = true;
 }
 
 void Player::loadFiles()

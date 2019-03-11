@@ -15,6 +15,7 @@ class Cell
 
 	bool containsWall;
 	bool containsCoin;
+
 public:
 	// Declare public function members
 	Cell();
