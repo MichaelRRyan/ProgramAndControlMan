@@ -8,9 +8,9 @@
 #include "Globals.h"
 #include "Player.h"
 #include "WalkerEnemy.h"
+#include "Screens.h"
 
 const unsigned MAX_GHOSTS{ 4 };
-enum class GameState{ MenuScreen, HelpScreen, NameScreen, GamePlay, Pause, GameOver };
 
 class Game
 {
@@ -38,6 +38,7 @@ private:
 	Cell m_maze[MAX_ROWS][MAX_COLS];
 	WalkerEnemy m_ghost[MAX_GHOSTS];
 	Player m_player;
+	Screens m_menuScreens;
 	
 
 	sf::Font m_arialFont;

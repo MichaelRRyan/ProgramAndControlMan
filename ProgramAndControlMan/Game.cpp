@@ -45,11 +45,11 @@ void Game::processEvents()
 		{
 			m_window.close();
 		}
-		if (!m_gameOver)
+		if (s_currentState == GameState::Gameplay)
 		{
 			m_player.move(checkMovementInput(nextEvent), m_maze);
 		}
-		else
+		if (s_currentState == GameState::GameOver)
 		{
 			if (sf::Event::KeyPressed == nextEvent.type)
 			{
@@ -57,10 +57,14 @@ void Game::processEvents()
 				{
 					setupMaze();
 					setupGame();
+					s_currentState = GameState::Gameplay;
 				}
 			}
 		}
-		
+		if (s_currentState == GameState::MenuScreen || s_currentState == GameState::HelpScreen || s_currentState == GameState::NameScreen)
+		{
+			m_menuScreens.processEvents(nextEvent);
+		}
 	}
 }
 
@@ -71,13 +75,13 @@ void Game::update(sf::Time t_deltaTime)
 		m_window.close();
 	}
 
-	if (!m_gameOver)
+	if (s_currentState == GameState::Gameplay)
 	{
 		for (int i = 0; i < MAX_GHOSTS; i++)
 		{
 			if (m_player.getPos() == m_ghost[i].getPos()) // Check if the row and col of a ghost and the player match
 			{
-				m_gameOver = true;
+				s_currentState = GameState::GameOver;
 			}
 		}
 
@@ -95,19 +99,33 @@ void Game::render()
 {
 	m_window.clear();
 
-	drawMaze();
-	m_window.draw(m_player.getBody());
-
-	for (int i = 0; i < MAX_GHOSTS; i++)
+	switch (s_currentState)
 	{
-		m_window.draw(m_ghost[i].getBody());
-	}
+	case GameState::MenuScreen:
+		m_menuScreens.draw(m_window);
+		break;
+	case GameState::HelpScreen:
+		break;
+	case GameState::NameScreen:
+		break;
+	case GameState::Gameplay:
+		drawMaze();
+		m_window.draw(m_player.getBody());
 
-	m_window.draw(m_scoreText);
+		for (int i = 0; i < MAX_GHOSTS; i++)
+		{
+			m_window.draw(m_ghost[i].getBody());
+		}
 
-	if (m_gameOver)
-	{
+		m_window.draw(m_scoreText);
+		break;
+	case GameState::Pause:
+		break;
+	case GameState::GameOver:
 		m_window.draw(m_gameOverText);
+		break;
+	default:
+		break;
 	}
 
 	m_window.display();
@@ -115,7 +133,6 @@ void Game::render()
 
 void Game::setupGame()
 {
-	m_gameOver = false;
 	m_player.setScore(0);
 
 	bool found = false;
