@@ -4,7 +4,8 @@
 
 Game::Game() :
 	m_window{ sf::VideoMode{ 800u, 800u, 32u }, "Basic Game" },
-	m_exitGame{ false }
+	m_exitGame{ false },
+	m_gameState{ GameState::MenuScreen }
 {
 	setupMaze();
 	setupGame();
@@ -45,11 +46,11 @@ void Game::processEvents()
 		{
 			m_window.close();
 		}
-		if (s_currentState == GameState::Gameplay)
+		if (m_gameState == GameState::Gameplay)
 		{
 			m_player.move(checkMovementInput(nextEvent), m_maze);
 		}
-		if (s_currentState == GameState::GameOver)
+		if (m_gameState == GameState::GameOver)
 		{
 			if (sf::Event::KeyPressed == nextEvent.type)
 			{
@@ -57,13 +58,13 @@ void Game::processEvents()
 				{
 					setupMaze();
 					setupGame();
-					s_currentState = GameState::Gameplay;
+					m_gameState = GameState::Gameplay;
 				}
 			}
 		}
-		if (s_currentState == GameState::MenuScreen || s_currentState == GameState::HelpScreen || s_currentState == GameState::NameScreen)
+		if (m_gameState == GameState::MenuScreen || m_gameState == GameState::HelpScreen || m_gameState == GameState::NameScreen)
 		{
-			m_menuScreens.processEvents(nextEvent);
+			m_menuScreens.processEvents(nextEvent, m_gameState, m_playerName);
 		}
 	}
 }
@@ -75,17 +76,17 @@ void Game::update(sf::Time t_deltaTime)
 		m_window.close();
 	}
 
-	if (s_currentState == GameState::Gameplay)
+	if (m_gameState == GameState::Gameplay)
 	{
 		for (int i = 0; i < MAX_GHOSTS; i++)
 		{
 			if (m_player.getPos() == m_ghost[i].getPos()) // Check if the row and col of a ghost and the player match
 			{
-				s_currentState = GameState::GameOver;
+				m_gameState = GameState::GameOver;
 			}
 		}
 
-		m_scoreText.setString("Score: " + std::to_string(m_player.getScore()));
+		m_scoreText.setString(m_playerName + "'s Score: " + std::to_string(m_player.getScore()));
 
 		for (int i = 0; i < MAX_GHOSTS; i++)
 		{
@@ -99,15 +100,8 @@ void Game::render()
 {
 	m_window.clear();
 
-	switch (s_currentState)
+	switch (m_gameState)
 	{
-	case GameState::MenuScreen:
-		m_menuScreens.draw(m_window);
-		break;
-	case GameState::HelpScreen:
-		break;
-	case GameState::NameScreen:
-		break;
 	case GameState::Gameplay:
 		drawMaze();
 		m_window.draw(m_player.getBody());
@@ -125,6 +119,7 @@ void Game::render()
 		m_window.draw(m_gameOverText);
 		break;
 	default:
+		m_menuScreens.draw(m_window, m_gameState, m_playerName);
 		break;
 	}
 

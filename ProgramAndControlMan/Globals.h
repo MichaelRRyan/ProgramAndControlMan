@@ -20,8 +20,6 @@ enum class GameState
 	GameOver
 };
 
-static GameState s_currentState = GameState::MenuScreen;
-
 static const int MAX_ROWS{ 25 };
 static const int MAX_COLS{ 25 };
 

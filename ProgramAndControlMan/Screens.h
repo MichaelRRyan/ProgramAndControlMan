@@ -3,6 +3,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <string>
 #include "Globals.h"
 
 const sf::Vector2f BUTTON_ONE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 400.0f };
@@ -26,11 +27,13 @@ class Screens
 	sf::Text m_titleText;
 	sf::Text m_buttonText;
 	sf::Text m_helpText;
+	sf::Text m_enterNameText;
+	sf::Text m_nameText;
 
 public:
 	Screens();
 	void loadFiles();
-	void processEvents(sf::Event t_event);
-	void draw(sf::RenderWindow & t_window);
+	void processEvents(sf::Event t_event, GameState & t_gameState, std::string & t_playerName);
+	void draw(sf::RenderWindow & t_window, GameState t_gameState, std::string t_playerName);
 };
 

@@ -4,6 +4,7 @@
 #define GAME
 
 #include <SFML/Graphics.hpp>
+#include <string>
 #include "Cell.h"
 #include "Globals.h"
 #include "Player.h"
@@ -35,15 +36,19 @@ private:
 	bool m_exitGame;
 	bool m_gameOver;
 
+	GameState m_gameState;
+
 	Cell m_maze[MAX_ROWS][MAX_COLS];
 	WalkerEnemy m_ghost[MAX_GHOSTS];
 	Player m_player;
 	Screens m_menuScreens;
 	
-
 	sf::Font m_arialFont;
+
 	sf::Text m_scoreText;
 	sf::Text m_gameOverText;
+
+	std::string m_playerName;
 };
 
 #endif // !GAME
