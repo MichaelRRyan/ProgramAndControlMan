@@ -3,7 +3,7 @@
 #include "Game.h"
 
 Game::Game() :
-	m_window{ sf::VideoMode{ 800u, 800u, 32u }, "Basic Game" },
+	m_window{ sf::VideoMode{ 800u, 800u, 32u }, "Program And Control Man" },
 	m_exitGame{ false },
 	m_gameState{ GameState::MenuScreen }
 {
@@ -64,7 +64,7 @@ void Game::processEvents()
 		}
 		if (m_gameState == GameState::MenuScreen || m_gameState == GameState::HelpScreen || m_gameState == GameState::NameScreen)
 		{
-			m_menuScreens.processEvents(nextEvent, m_gameState, m_playerName);
+			m_menuScreens.processEvents(nextEvent, m_gameState, m_playerName, m_exitGame);
 		}
 	}
 }
@@ -80,7 +80,7 @@ void Game::update(sf::Time t_deltaTime)
 	{
 		for (int i = 0; i < MAX_GHOSTS; i++)
 		{
-			if (m_player.getPos() == m_ghost[i].getPos()) // Check if the row and col of a ghost and the player match
+			if (m_player.getPos() == m_ghosts[i].getPos()) // Check if the row and col of a ghost and the player match
 			{
 				m_gameState = GameState::GameOver;
 			}
@@ -90,7 +90,7 @@ void Game::update(sf::Time t_deltaTime)
 
 		for (int i = 0; i < MAX_GHOSTS; i++)
 		{
-			m_ghost[i].move(m_maze);
+			m_ghosts[i].move(m_maze, m_ghosts);
 		}
 	}
 	
@@ -108,7 +108,7 @@ void Game::render()
 
 		for (int i = 0; i < MAX_GHOSTS; i++)
 		{
-			m_window.draw(m_ghost[i].getBody());
+			m_window.draw(m_ghosts[i].getBody());
 		}
 
 		m_window.draw(m_scoreText);
@@ -130,7 +130,8 @@ void Game::setupGame()
 {
 	m_player.setScore(0);
 
-	bool found = false;
+	bool found = false; // Whether the player has been placed or not
+	int ghosts = 0;
 	for (int row = 0; row < MAX_ROWS; row++)
 	{
 		for (int col = 0; col < MAX_COLS; col++)
@@ -143,12 +144,32 @@ void Game::setupGame()
 					m_maze[row][col].setContainsCoin(false);
 					found = true;
 				}
+			}
+		}
+	}
 
-				for (int i = 0; i < MAX_GHOSTS; i++)
+	// Loop backwards through the maze to place the ghosts
+	for (int row = MAX_ROWS - 1; row >= 0; row--)
+	{
+		for (int col = MAX_COLS - 1; col  >= 0; col--)
+		{
+			if (ghosts < MAX_GHOSTS)
+			{
+				if (!m_maze[row][col].getContainsWall())
 				{
-					m_ghost[i].setPos(row, col);
+					m_ghosts[ghosts].setPos(row, col);
+					ghosts++;
 				}
 			}
+			else
+			{
+				break;
+			}
+			
+		}
+		if (ghosts >= MAX_GHOSTS)
+		{
+			break;
 		}
 	}
 }

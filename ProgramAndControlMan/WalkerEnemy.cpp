@@ -22,60 +22,60 @@ void WalkerEnemy::setPos(int t_row, int t_col)
 {
 	m_pos.x = t_col;
 	m_pos.y = t_row;
+
+	m_body.setPosition(static_cast<sf::Vector2f>(m_pos * 32)); // Set the position to the current cell
 }
 
-void WalkerEnemy::move(Cell t_maze[][MAX_COLS])
+void WalkerEnemy::move(Cell t_maze[][MAX_COLS], WalkerEnemy t_ghosts[])
 {
 	if (rand() % 10 == 0) // 1 in 10 chance of moving each frame
 	{
-		if (m_moveDir == Direction::North)
-		{
-			m_body.setTextureRect(sf::IntRect{ 0,96,32,32 }); // Set the sprite to the look up texture
+		sf::Vector2i desiredPosition = m_pos + Global::getDirectionVector(m_moveDir);
+		bool blocked = false;
 
-			if (!t_maze[m_pos.y - 1][m_pos.x].getContainsWall())
+		if (!t_maze[desiredPosition.y][desiredPosition.x].getContainsWall())
+		{
+			for (int i = 0; i < MAX_GHOSTS; i++)
 			{
-				m_pos.y--;
-			}
-			else
-			{
-				m_moveDir = static_cast<Direction>(rand() % 4 + 1);
+				if (t_ghosts[i].getPos() == desiredPosition)
+				{
+					blocked = true;
+					break;
+				}
 			}
 		}
-		else if (m_moveDir == Direction::South)
+		else
 		{
+			blocked = true;
+		}
+
+		// Move if not blocked
+		if (!blocked)
+		{
+			m_pos = desiredPosition;
+		}
+		else
+		{
+			m_moveDir = static_cast<Direction>(rand() % 4 + 1);
+		}
+
+		// Switch the texture rectangle to change the facing direction
+		switch (m_moveDir)
+		{
+		case Direction::North:
+			m_body.setTextureRect(sf::IntRect{ 0,96,32,32 }); // Set the sprite to the look up texture
+			break;
+		case Direction::South:
 			m_body.setTextureRect(sf::IntRect{ 0,64,32,32 }); // Set the sprite to the look down texture
-			if (!t_maze[m_pos.y + 1][m_pos.x].getContainsWall())
-			{
-				m_pos.y++;
-			}
-			else
-			{
-				m_moveDir = static_cast<Direction>(rand() % 4 + 1);
-			}
-		}
-		else if (m_moveDir == Direction::West)
-		{
+			break;
+		case Direction::West:
 			m_body.setTextureRect(sf::IntRect{ 0,32,32,32 }); // Set the sprite to the look left texture
-			if (!t_maze[m_pos.y][m_pos.x - 1].getContainsWall())
-			{
-				m_pos.x--;
-			}
-			else
-			{
-				m_moveDir = static_cast<Direction>(rand() % 4 + 1);
-			}
-		}
-		else if (m_moveDir == Direction::East)
-		{
+			break;
+		case Direction::East:
 			m_body.setTextureRect(sf::IntRect{ 0,0,32,32 }); // Set the sprite to the look right texture
-			if (!t_maze[m_pos.y][m_pos.x + 1].getContainsWall())
-			{
-				m_pos.x++;
-			}
-			else
-			{
-				m_moveDir = static_cast<Direction>(rand() % 4 + 1);
-			}
+			break;
+		default:
+			break;
 		}
 
 		m_body.setPosition(static_cast<sf::Vector2f>(m_pos * 32)); // Set the position to the current cell

@@ -1,7 +1,9 @@
 #include "Screens.h"
 
 
-
+/// <summary>
+/// Default constructer and setup for the game screens.
+/// </summary>
 Screens::Screens()
 {
 	loadFiles();
@@ -9,8 +11,8 @@ Screens::Screens()
 	m_backgroundSprite.setTexture(m_backgroundTexture);
 
 	m_buttonSprite.setTexture(m_buttonTexture);
-	m_buttonSprite.setTextureRect(sf::IntRect{ BUTTON_WIDTH,45,BUTTON_WIDTH,BUTTON_HEIGHT });
-	m_buttonSprite.setOrigin(m_buttonSprite.getGlobalBounds().width / 2, m_buttonSprite.getGlobalBounds().height / 2);
+	m_buttonSprite.setTextureRect(sf::IntRect{ BUTTON_IMAGE_WIDTH,45,BUTTON_IMAGE_WIDTH,BUTTON_IMAGE_HEIGHT });
+	m_buttonSprite.setOrigin(BUTTON_IMAGE_WIDTH / 2, BUTTON_IMAGE_HEIGHT / 2);
 	m_buttonSprite.setScale(1.8f, 1.8f);
 
 	m_titleText.setFont(m_pacFont);
@@ -36,6 +38,10 @@ Screens::Screens()
 	m_enterNameText.setOrigin(m_titleText.getGlobalBounds().width / 2, 0);
 }
 
+/// <summary>
+/// Load game files.
+/// Load textures and fonts.
+/// </summary>
 void Screens::loadFiles()
 {
 	if (!m_backgroundTexture.loadFromFile("ASSETS\\IMAGES\\pacmanBackground.jpg"))
@@ -52,62 +58,126 @@ void Screens::loadFiles()
 	}
 }
 
-void Screens::processEvents(sf::Event t_event, GameState & t_gameState, std::string & t_playerName)
+/// <summary>
+/// Process the events for the screens.
+/// </summary>
+/// <param name="t_event">User event</param>
+/// <param name="t_gameState">Game state</param>
+/// <param name="t_playerName">Player's name</param>
+/// <param name="t_gameOver">Game over bool</param>
+void Screens::processEvents(sf::Event t_event, GameState & t_gameState, std::string & t_playerName, bool &t_gameOver)
 {
 	switch (t_gameState)
 	{
 	case GameState::MenuScreen:
-		if (sf::Event::MouseButtonPressed == t_event.type)
-		{
-
-			if (sf::Mouse::Left == t_event.mouseButton.button)
-			{
-				// Check that the click was within the horisontal bounds of the buttons
-				if (t_event.mouseButton.x > BUTTON_ONE_POSITION.x - BUTTON_WIDTH / 2 && t_event.mouseButton.x < BUTTON_ONE_POSITION.x + BUTTON_WIDTH / 2)
-				{
-					// Check that the click is within the vertical bounds of the first the button
-					if (t_event.mouseButton.y > BUTTON_ONE_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_ONE_POSITION.y + BUTTON_HEIGHT / 2)
-					{
-						t_gameState = GameState::NameScreen;
-					}
-				}
-			}
-		}
+		menuEvents(t_event, t_gameState, t_gameOver);
 		break;
 	case GameState::NameScreen:
-		if (t_event.type == sf::Event::TextEntered)
-		{
-			
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
-			{
-				t_gameState = GameState::Gameplay;
-			}
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace)) // Delete characters if backspace is pressed
-			{
-				if (t_playerName.length() > 0) // Check that there are characters in the array
-				{
-					t_playerName.pop_back(); // Remove the last letter of the string
-				}
-			}
-			else if (t_playerName.length() < 5)
-			{
-				if (t_event.text.unicode >= 'a' && t_event.text.unicode <= 'z')
-				{ 
-					// Add the capital of the inputted letter onto the end player name string
-					t_playerName.push_back(static_cast<char>(t_event.text.unicode - 32));
-				}
-				else if ((t_event.text.unicode >= 'A' && t_event.text.unicode <= 'Z') || t_event.text.unicode == ' ')
-				{
-					// Add the inputted letter onto the end player name string
-					t_playerName.push_back(static_cast<char>(t_event.text.unicode));
-				}
-				
-			}
-		}
+		nameScreenEvents(t_event, t_gameState, t_playerName);
+		break;
+	case GameState::HelpScreen:
+		helpScreenEvents(t_event, t_gameState);
 		break;
 	}
 }
 
+/// <summary>
+/// Process the events for the menu screen.
+/// </summary>
+/// <param name="t_event">User event</param>
+/// <param name="t_gameState">Game state</param>
+/// <param name="t_gameOver">Game over bool</param>
+void Screens::menuEvents(sf::Event t_event, GameState & t_gameState, bool & t_gameOver)
+{
+	if (sf::Event::MouseButtonPressed == t_event.type)
+	{
+
+		if (sf::Mouse::Left == t_event.mouseButton.button)
+		{
+			// Check that the click was within the horisontal bounds of the buttons
+			if (t_event.mouseButton.x > BUTTON_ONE_POSITION.x - BUTTON_WIDTH / 2 && t_event.mouseButton.x < BUTTON_ONE_POSITION.x + BUTTON_WIDTH / 2)
+			{
+				// Check that the click is within the vertical bounds of the first the button (Start)
+				if (t_event.mouseButton.y > BUTTON_ONE_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_ONE_POSITION.y + BUTTON_HEIGHT / 2)
+				{
+					t_gameState = GameState::NameScreen;
+				}
+				// Check that the click is within the vertical bounds of the second the button (Help)
+				if (t_event.mouseButton.y > BUTTON_TWO_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_TWO_POSITION.y + BUTTON_HEIGHT / 2)
+				{
+					t_gameState = GameState::HelpScreen;
+				}
+				// Check that the click is within the vertical bounds of the last the button (Exit)
+				if (t_event.mouseButton.y > BUTTON_THREE_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_THREE_POSITION.y + BUTTON_HEIGHT / 2)
+				{
+					t_gameOver = true;;
+				}
+			}
+		}
+	}
+}
+
+/// <summary>
+/// Process name screen events.
+/// </summary>
+/// <param name="t_event">User event</param>
+/// <param name="t_gameState">Game state</param>
+/// <param name="t_playerName">Player's name</param>
+void Screens::nameScreenEvents(sf::Event t_event, GameState & t_gameState, std::string & t_playerName)
+{
+	if (t_event.type == sf::Event::TextEntered)
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) && t_playerName.length() > 0)
+		{
+			t_gameState = GameState::Gameplay;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace)) // Delete characters if backspace is pressed
+		{
+			if (t_playerName.length() > 0) // Check that there are characters in the array
+			{
+				t_playerName.pop_back(); // Remove the last letter of the string
+			}
+		}
+		else if (t_playerName.length() < 5)
+		{
+			if (t_event.text.unicode >= 'a' && t_event.text.unicode <= 'z')
+			{
+				// Add the capital of the inputted letter onto the end player name string
+				t_playerName.push_back(static_cast<char>(t_event.text.unicode - 32));
+			}
+			else if ((t_event.text.unicode >= 'A' && t_event.text.unicode <= 'Z') || t_event.text.unicode == ' ')
+			{
+				// Add the inputted letter onto the end player name string
+				t_playerName.push_back(static_cast<char>(t_event.text.unicode));
+			}
+
+		}
+	}
+}
+
+/// <summary>
+/// Process the events for the help screen.
+/// </summary>
+/// <param name="t_event">User event</param>
+/// <param name="t_gameState">Game state</param>
+void Screens::helpScreenEvents(sf::Event t_event, GameState & t_gameState)
+{
+	if (sf::Event::KeyPressed == t_event.type)
+	{
+		if (sf::Keyboard::Escape == t_event.key.code)
+		{
+			t_gameState = GameState::MenuScreen;
+		}
+	}
+}
+
+/// <summary>
+/// Draw function for all screens.
+/// Draw the current screen.
+/// </summary>
+/// <param name="t_window">Game window</param>
+/// <param name="t_gameState">Game state</param>
+/// <param name="t_playerName">Player's name</param>
 void Screens::draw(sf::RenderWindow & t_window, GameState t_gameState, std::string t_playerName)
 {
 	t_window.draw(m_backgroundSprite);

@@ -11,8 +11,6 @@
 #include "WalkerEnemy.h"
 #include "Screens.h"
 
-const unsigned MAX_GHOSTS{ 4 };
-
 class Game
 {
 public:
@@ -34,12 +32,11 @@ private:
 
 	sf::RenderWindow m_window;
 	bool m_exitGame;
-	bool m_gameOver;
 
 	GameState m_gameState;
 
 	Cell m_maze[MAX_ROWS][MAX_COLS];
-	WalkerEnemy m_ghost[MAX_GHOSTS];
+	WalkerEnemy m_ghosts[MAX_GHOSTS];
 	Player m_player;
 	Screens m_menuScreens;
 	
