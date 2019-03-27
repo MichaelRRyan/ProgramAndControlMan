@@ -14,6 +14,10 @@ class Player
 	int m_score;
 	bool m_canMove;
 
+	// Texture variables
+	int characterHeight;
+	int characterWidthMargin;
+
 public:
 	// Declare public function members
 	Player();

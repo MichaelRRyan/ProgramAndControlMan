@@ -5,7 +5,6 @@ Cell::Cell()
 {
 	m_containsWall = false;
 	m_containsCoin = false;
-	loadFiles();
 }
 
 void Cell::setContainsWall(bool t_wall)
