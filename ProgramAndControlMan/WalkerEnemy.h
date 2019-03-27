@@ -7,7 +7,7 @@
 class WalkerEnemy
 {
 	// Declare private data members
-	const int MOVEMENT_TIME = 10;
+	const int MOVEMENT_TIME = 15;
 
 	sf::Texture m_spriteSheet;
 	sf::Sprite m_body;
@@ -18,8 +18,6 @@ class WalkerEnemy
 
 	// Texture variables
 	sf::Vector2i m_characterNumber;
-	int m_characterHeight;
-	int m_characterWidthMargin;
 	int m_characterDirection;
 
 public:

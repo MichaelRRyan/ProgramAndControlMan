@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "Globals.h"
+#include "Player.h"
 
 const int BUTTON_IMAGE_WIDTH{ 190 };
 const int BUTTON_IMAGE_HEIGHT{ 49 };
@@ -25,6 +26,7 @@ class Screens
 
 	sf::Sprite m_backgroundSprite;
 	sf::Sprite m_buttonSprite;
+	sf::Sprite m_arrowSprite;
 
 	sf::Font m_pacFont;
 
@@ -34,14 +36,17 @@ class Screens
 	sf::Text m_enterNameText;
 	sf::Text m_nameText;
 
+	int m_characterNumber;
+
 public:
 	Screens();
 	void loadFiles();
-	void setupHelpText();
-	void processEvents(sf::Event t_event, GameState & t_gameState, std::string & t_playerName, bool &t_gameOver);
+	void setupText();
+	void processEvents(sf::Event t_event, GameState & t_gameState, std::string & t_playerName, bool &t_gameOver, Player &t_player);
 	void menuEvents(sf::Event t_event, GameState & t_gameState, bool &t_gameOver);
 	void nameScreenEvents(sf::Event t_event, GameState & t_gameState, std::string & t_playerName);
 	void helpScreenEvents(sf::Event t_event, GameState & t_gameState);
-	void draw(sf::RenderWindow & t_window, GameState t_gameState, std::string t_playerName);
+	void characterScreenEvents(sf::Event t_event, GameState & t_gameState, Player &t_player);
+	void draw(sf::RenderWindow & t_window, GameState t_gameState, std::string t_playerName, Player & t_player);
 };
 

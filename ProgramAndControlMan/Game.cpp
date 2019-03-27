@@ -52,10 +52,6 @@ void Game::processEvents()
 		{
 			m_window.close();
 		}
-		if (m_gameState == GameState::Gameplay)
-		{
-			m_player.move(checkMovementInput(nextEvent), m_maze);
-		}
 		if (m_gameState == GameState::GameOver)
 		{
 			if (sf::Event::KeyPressed == nextEvent.type)
@@ -68,9 +64,10 @@ void Game::processEvents()
 				}
 			}
 		}
-		if (m_gameState == GameState::MenuScreen || m_gameState == GameState::HelpScreen || m_gameState == GameState::NameScreen)
+		if (m_gameState == GameState::MenuScreen || m_gameState == GameState::HelpScreen
+			|| m_gameState == GameState::NameScreen || m_gameState == GameState::CharacterScreen)
 		{
-			m_menuScreens.processEvents(nextEvent, m_gameState, m_playerName, m_exitGame);
+			m_menuScreens.processEvents(nextEvent, m_gameState, m_playerName, m_exitGame, m_player);
 		}
 	}
 }
@@ -87,18 +84,14 @@ void Game::update(sf::Time t_deltaTime)
 		for (int i = 0; i < MAX_GHOSTS; i++)
 		{
 			m_player.checkCollision(m_ghosts[i]);
+			m_ghosts[i].move(m_maze, m_ghosts);
 		}
 
 		m_scoreText.setString(m_playerName + "'s Score: " + std::to_string(m_player.getScore()));
 		m_livesText.setString("Health: " + std::to_string(m_player.getLives()));
 
-		for (int i = 0; i < MAX_GHOSTS; i++)
-		{
-			m_ghosts[i].move(m_maze, m_ghosts);
-		}
+		m_player.update(m_maze, m_gameState);
 	}
-
-	m_player.update(m_gameState);
 }
 
 void Game::render()
@@ -126,7 +119,7 @@ void Game::render()
 		m_window.draw(m_scoreText);
 		break;
 	default:
-		m_menuScreens.draw(m_window, m_gameState, m_playerName);
+		m_menuScreens.draw(m_window, m_gameState, m_playerName, m_player);
 		break;
 	}
 
@@ -254,7 +247,7 @@ void Game::drawMaze()
 	{
 		for (int col = 0; col < MAX_COLS; col++)
 		{
-			m_tileSprite.setPosition(32 * col, 32 * row); // Set the x and y of the tile sprite
+			m_tileSprite.setPosition(static_cast<float>(32 * col), static_cast<float>(32 * row)); // Set the x and y of the tile sprite
 			int grassType = (col + row) % 3; // Picks between grass tiles to draw for each tile based off the row and col
 			m_tileSprite.setTextureRect(sf::IntRect{ TILE_SIZE * (21 + grassType), TILE_SIZE * 5, TILE_SIZE, TILE_SIZE }); // Set the ground tile
 			m_window.draw(m_tileSprite); // Draw the ground
@@ -266,46 +259,4 @@ void Game::drawMaze()
 			}
 		}
 	}
-}
-
-Direction Game::checkMovementInput(sf::Event t_nextEvent)
-{
-	if (m_player.getCanMove()) // Check that the player can move
-	{
-		if (t_nextEvent.type == sf::Event::KeyPressed) // Check if a key is pressed
-		{
-			m_player.setCanMove(false); // Player can no longer move
-
-			// Get and return the player move direction
-			if (t_nextEvent.key.code == sf::Keyboard::Left)
-			{
-				return Direction::West;
-			}
-			if (t_nextEvent.key.code == sf::Keyboard::Right)
-			{
-				return Direction::East;
-			}
-			if (t_nextEvent.key.code == sf::Keyboard::Left)
-			{
-				return Direction::West;
-			}
-			if (t_nextEvent.key.code == sf::Keyboard::Up)
-			{
-				return Direction::North;
-			}
-			if (t_nextEvent.key.code == sf::Keyboard::Down)
-			{
-				return Direction::South;
-			}
-		}
-	}
-	else // If the player can't move
-	{
-		if (t_nextEvent.type == sf::Event::KeyReleased) // If a key was released
-		{
-			m_player.setCanMove(true); // The player can move again
-		}
-	}
-
-	return Direction::None;
 }

@@ -15,6 +15,7 @@ enum class GameState
 	MenuScreen,
 	HelpScreen,
 	NameScreen,
+	CharacterScreen,
 	Gameplay,
 	Pause,
 	GameOver
@@ -35,7 +36,11 @@ const unsigned MAX_GHOSTS{ 4 };
 const unsigned WINDOW_WIDTH{ 800u };
 const unsigned WINDOW_HEIGHT{ 800u };
 
+// Texture Information
 const int TILE_SIZE{ 32 };
+const int CHAR_WIDTH{ 32 }; // Character Width - the width of each character sprite
+const int CHAR_HEIGHT{ 64 }; // Character height - the height of each character sprite
+const int CHAR_SPACING{ 54 }; // The horisontal spacing between each character on the sprite sheet (including margin)
 
 // Global game functions
 class Global
