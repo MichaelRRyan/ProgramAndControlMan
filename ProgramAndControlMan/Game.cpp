@@ -3,7 +3,7 @@
 #include "Game.h"
 
 Game::Game() :
-	m_window{ sf::VideoMode{ 800u, 800u, 32u }, "Program And Control Man" },
+	m_window{ sf::VideoMode{ WINDOW_WIDTH, WINDOW_HEIGHT, 32u }, "Program And Control Man" },
 	m_exitGame{ false },
 	m_gameState{ GameState::MenuScreen }
 {
@@ -128,6 +128,12 @@ void Game::render()
 
 void Game::setupGame()
 {
+	if (!m_terrainTexture.loadFromFile("ASSETS\\IMAGES\\terrain_atlas.png"))
+	{
+		// Error loading file
+	}
+	m_tileSprite.setTexture(m_terrainTexture);
+
 	m_player.setScore(0);
 
 	bool found = false; // Whether the player has been placed or not
@@ -223,9 +229,14 @@ void Game::drawMaze()
 	{
 		for (int col = 0; col < MAX_COLS; col++)
 		{
+			m_tileSprite.setPosition(32 * col, 32 * row);
+			m_tileSprite.setTextureRect(sf::IntRect{ TILE_SIZE * 21, TILE_SIZE * 5, TILE_SIZE, TILE_SIZE });
+			m_window.draw(m_tileSprite);
+
 			if (m_maze[row][col].getContainsCoin() || m_maze[row][col].getContainsWall())
 			{
-				m_window.draw(m_maze[row][col].getBody());
+				m_tileSprite.setTextureRect(m_maze[row][col].getTexturePosition());
+				m_window.draw(m_tileSprite);
 			}
 		}
 	}

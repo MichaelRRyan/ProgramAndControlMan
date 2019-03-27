@@ -45,6 +45,9 @@ private:
 	sf::Text m_scoreText;
 	sf::Text m_gameOverText;
 
+	sf::Texture m_terrainTexture;
+	sf::Sprite m_tileSprite;
+
 	std::string m_playerName;
 };
 

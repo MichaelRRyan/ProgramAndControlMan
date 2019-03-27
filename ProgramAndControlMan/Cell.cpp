@@ -3,42 +3,25 @@
 
 Cell::Cell()
 {
+	m_containsWall = false;
+	m_containsCoin = false;
 	loadFiles();
-	containsWall = false;
-	containsCoin = false;
-	body.setTexture(blankTexture);
-}
-
-void Cell::loadFiles()
-{
-	if (!wallTexture.loadFromFile("ASSETS\\IMAGES\\wallCell.jpg"))
-	{
-		// Error
-	}
-	if (!coinTexture.loadFromFile("ASSETS\\IMAGES\\smallPill.png"))
-	{
-		// Error
-	}
-	if (!blankTexture.loadFromFile("ASSETS\\IMAGES\\emptyCell.png"))
-	{
-		// Error
-	}
 }
 
 void Cell::setContainsWall(bool t_wall)
 {
-	containsWall = t_wall;
+	m_containsWall = t_wall;
 	if (t_wall)
 	{
-		body.setTexture(wallTexture);
+		m_texturePosition = sf::IntRect{ TILE_SIZE * 10,TILE_SIZE * 7,TILE_SIZE,TILE_SIZE };
 	}
 }
 
 void Cell::setContainsCoin(bool t_coin)
 {
-	containsCoin = t_coin;
+	m_containsCoin = t_coin;
 	if (t_coin)
 	{
-		body.setTexture(coinTexture);
+		m_texturePosition = sf::IntRect{ TILE_SIZE * 12,TILE_SIZE * 24,TILE_SIZE,TILE_SIZE };
 	}
 }

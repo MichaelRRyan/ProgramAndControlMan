@@ -36,6 +36,8 @@ Screens::Screens()
 	m_enterNameText.setCharacterSize(30u);
 	m_enterNameText.setString("ENTER YOUR NAME:");
 	m_enterNameText.setOrigin(m_titleText.getGlobalBounds().width / 2, 0);
+
+	setupHelpText();
 }
 
 /// <summary>
@@ -56,6 +58,21 @@ void Screens::loadFiles()
 	{
 		// Error loading font file
 	}
+}
+
+void Screens::setupHelpText()
+{
+	m_helpText.setFont(m_pacFont);
+	m_helpText.setFillColor(sf::Color::White);
+	m_helpText.setPosition(50.0f, 350.0f);
+	m_helpText.setCharacterSize(20u);
+	m_helpText.setLineSpacing(1.2);
+
+	std::string helpTextString = "";
+	helpTextString.append("instructions:\nmovement:\nUSE THE ARROW KEYS TO MOVE AROUND\nTHE MAZE.");
+	helpTextString.append("\ngoal:\nPICKUP ALL THE PELLETS IN THE LEVEL\nAND YOU WIN.\nTRY TO SURVIVE AS MANY LEVELS AS POSSIBLE\nAND GET THE HIGHEST SCORE.");
+	helpTextString.append("\nghosts:\nTHE RED GHOSTS ARE EVIL DONT TOUCH\nTHEM OR YOU WILL LOSE A LIFE.\nLOSE ALL YOUR LIVES AND YOU LOSE.");
+	m_helpText.setString(helpTextString);
 }
 
 /// <summary>
@@ -169,6 +186,23 @@ void Screens::helpScreenEvents(sf::Event t_event, GameState & t_gameState)
 			t_gameState = GameState::MenuScreen;
 		}
 	}
+	if (sf::Event::MouseButtonPressed == t_event.type)
+	{
+
+		if (sf::Mouse::Left == t_event.mouseButton.button)
+		{
+			// Check that the click was within the horisontal bounds of the buttons
+			if (t_event.mouseButton.x > BUTTON_HELP_POSITION.x - BUTTON_WIDTH / 2 && t_event.mouseButton.x < BUTTON_HELP_POSITION.x + BUTTON_WIDTH / 2)
+			{
+				// Check that the click is within the vertical bounds of the first the button (Start)
+				if (t_event.mouseButton.y > BUTTON_HELP_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_HELP_POSITION.y + BUTTON_HEIGHT / 2)
+				{
+					t_gameState = GameState::MenuScreen;
+				}
+			}
+
+		}
+	}
 }
 
 /// <summary>
@@ -211,6 +245,15 @@ void Screens::draw(sf::RenderWindow & t_window, GameState t_gameState, std::stri
 		m_nameText.setOrigin(m_nameText.getGlobalBounds().width / 2, m_nameText.getGlobalBounds().height / 1.5);
 		t_window.draw(m_nameText);
 		t_window.draw(m_enterNameText);
+		break;
+	case GameState::HelpScreen:
+		m_buttonText.setString("back");
+		m_buttonText.setOrigin(m_buttonText.getGlobalBounds().width / 2, m_buttonText.getGlobalBounds().height / 1.5);
+		m_buttonText.setPosition(BUTTON_HELP_POSITION);
+		m_buttonSprite.setPosition(BUTTON_HELP_POSITION);
+		t_window.draw(m_buttonSprite);
+		t_window.draw(m_buttonText);
+		t_window.draw(m_helpText);
 		break;
 	}
 

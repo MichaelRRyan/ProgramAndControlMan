@@ -27,6 +27,8 @@ const unsigned MAX_GHOSTS{ 4 };
 const unsigned WINDOW_WIDTH{ 800u };
 const unsigned WINDOW_HEIGHT{ 800u };
 
+const int TILE_SIZE{ 32 };
+
 // Global game functions
 class Global
 {
