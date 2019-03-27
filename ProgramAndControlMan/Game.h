@@ -43,6 +43,7 @@ private:
 	sf::Font m_arialFont;
 
 	sf::Text m_scoreText;
+	sf::Text m_livesText;
 	sf::Text m_gameOverText;
 
 	sf::Texture m_terrainTexture;

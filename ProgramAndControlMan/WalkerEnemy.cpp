@@ -6,20 +6,21 @@ WalkerEnemy::WalkerEnemy()
 {
 	loadFiles();
 	m_moveDir = static_cast<Direction>(rand() % 4 + 1);
-	moveTimer = 0;
+	m_moveTimer = 0;
 }
 
 void WalkerEnemy::loadFiles()
 {
-	characterHeight = 64;
-	characterWidthMargin = 22;
+	m_characterHeight = 64;
+	m_characterWidthMargin = 22;
+	m_characterNumber = { (TILE_SIZE + m_characterWidthMargin),m_characterHeight * 3 };
 
 	if (!m_spriteSheet.loadFromFile("ASSETS\\IMAGES\\characters.png"))
 	{
 		// Error loading image
 	}
 	m_body.setTexture(m_spriteSheet);
-	m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,3,TILE_SIZE,characterHeight });
+	m_body.setTextureRect(sf::IntRect{ m_characterNumber.x * 2,m_characterNumber.y,TILE_SIZE,m_characterHeight });
 	m_body.setOrigin(0, TILE_SIZE);
 }
 
@@ -33,12 +34,14 @@ void WalkerEnemy::setPos(int t_row, int t_col)
 
 void WalkerEnemy::move(Cell t_maze[][MAX_COLS], WalkerEnemy t_ghosts[])
 {
-	if (moveTimer <= 0) // The enemy can only move once its timer reaches zero
+	if (m_moveTimer <= 0) // The enemy can only move once its timer reaches zero
 	{
 		if (rand() % 6 == 0) // One in six chance each movement frames to change direction
 		{
 			m_moveDir = static_cast<Direction>(rand() % 4 + 1); // Find a new direction
 		}
+
+		m_previousPos = m_pos; // Set the previous position to the current one before moving
 
 		for (int i = 0; i < 4; i++) // Loop until the enemy moves, finds a new direction or it tries four times (to stop infinite loops)
 		{
@@ -76,12 +79,19 @@ void WalkerEnemy::move(Cell t_maze[][MAX_COLS], WalkerEnemy t_ghosts[])
 		}
 		
 		setTextureDirection(); // Set the texture to the direction
-		m_body.setPosition(static_cast<sf::Vector2f>(m_pos * 32)); // Set the position to the current cell
-		moveTimer = MOVEMENT_TIME; // Reset the move timer
+		//m_body.setPosition(static_cast<sf::Vector2f>(m_pos * 32)); // Set the position to the current cell
+		m_moveTimer = MOVEMENT_TIME; // Reset the move timer
 	}
 	else
 	{
-		moveTimer--;
+		m_moveTimer--;
+		// Work out the new X and Y with Linear Interpolation
+		float newX = (m_pos.x * 32) * (1.0f - (1.0f * m_moveTimer / MOVEMENT_TIME)) + (m_previousPos.x * 32) * (1.0f * m_moveTimer / MOVEMENT_TIME);
+		float newY = (m_pos.y * 32) * (1.0f - (1.0f * m_moveTimer / MOVEMENT_TIME)) + (m_previousPos.y * 32) * (1.0f * m_moveTimer / MOVEMENT_TIME);
+		m_body.setPosition(static_cast<float>(newX), static_cast<float>(newY)); // Set the position to the current cell
+		int frameNum = (1.0 * m_moveTimer / MOVEMENT_TIME) * 3;
+		sf::IntRect frame = sf::IntRect{ m_characterNumber.x + (m_characterNumber.x * frameNum), m_characterNumber.y + m_characterDirection * m_characterHeight,TILE_SIZE, m_characterHeight };
+		m_body.setTextureRect(frame);
 	}
 }
 
@@ -93,18 +103,22 @@ void WalkerEnemy::setTextureDirection()
 	switch (m_moveDir)
 	{
 	case Direction::North: // Set the sprite to the look up texture
-		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,characterHeight * 5,TILE_SIZE,characterHeight });
+		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + m_characterWidthMargin) * 2,m_characterHeight * 5,TILE_SIZE,m_characterHeight });
+		m_characterDirection = 2;
 		break;
 	case Direction::South: // Set the sprite to the look down texture
-		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,characterHeight * 3,TILE_SIZE,characterHeight });
+		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + m_characterWidthMargin) * 2,m_characterHeight * 3,TILE_SIZE,m_characterHeight });
+		m_characterDirection = 0;
 		break;
 	case Direction::West: // Set the sprite to the look left texture
-		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,characterHeight * 4,TILE_SIZE,characterHeight });
+		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + m_characterWidthMargin) * 2,m_characterHeight * 4,TILE_SIZE,m_characterHeight });
+		m_characterDirection = 1;
 		m_body.setScale(-1.0f, 1.0f);
 		m_body.setOrigin(TILE_SIZE, m_body.getOrigin().y);
 		break;
 	case Direction::East: // Set the sprite to the look right texture
-		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,characterHeight * 4,TILE_SIZE,characterHeight });
+		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + m_characterWidthMargin) * 2,m_characterHeight * 4,TILE_SIZE,m_characterHeight });
+		m_characterDirection = 1;
 		m_body.setScale(1.0f, 1.0f);
 		m_body.setOrigin(0.0f, m_body.getOrigin().y);
 		break;

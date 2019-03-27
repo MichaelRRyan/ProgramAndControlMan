@@ -7,6 +7,12 @@ Game::Game() :
 	m_exitGame{ false },
 	m_gameState{ GameState::MenuScreen }
 {
+	if (!m_terrainTexture.loadFromFile("ASSETS\\IMAGES\\terrain_atlas.png"))
+	{
+		// Error loading file
+	}
+	m_tileSprite.setTexture(m_terrainTexture);
+
 	setupMaze();
 	setupGame();
 	setupFontAndText();
@@ -80,20 +86,19 @@ void Game::update(sf::Time t_deltaTime)
 	{
 		for (int i = 0; i < MAX_GHOSTS; i++)
 		{
-			if (m_player.getPos() == m_ghosts[i].getPos()) // Check if the row and col of a ghost and the player match
-			{
-				m_gameState = GameState::GameOver;
-			}
+			m_player.checkCollision(m_ghosts[i]);
 		}
 
 		m_scoreText.setString(m_playerName + "'s Score: " + std::to_string(m_player.getScore()));
+		m_livesText.setString("Health: " + std::to_string(m_player.getLives()));
 
 		for (int i = 0; i < MAX_GHOSTS; i++)
 		{
 			m_ghosts[i].move(m_maze, m_ghosts);
 		}
 	}
-	
+
+	m_player.update(m_gameState);
 }
 
 void Game::render()
@@ -112,11 +117,13 @@ void Game::render()
 		}
 
 		m_window.draw(m_scoreText);
+		m_window.draw(m_livesText);
 		break;
 	case GameState::Pause:
 		break;
 	case GameState::GameOver:
 		m_window.draw(m_gameOverText);
+		m_window.draw(m_scoreText);
 		break;
 	default:
 		m_menuScreens.draw(m_window, m_gameState, m_playerName);
@@ -128,13 +135,8 @@ void Game::render()
 
 void Game::setupGame()
 {
-	if (!m_terrainTexture.loadFromFile("ASSETS\\IMAGES\\terrain_atlas.png"))
-	{
-		// Error loading file
-	}
-	m_tileSprite.setTexture(m_terrainTexture);
-
 	m_player.setScore(0);
+	m_player.setLives(3);
 
 	bool found = false; // Whether the player has been placed or not
 	int ghosts = 0;
@@ -171,7 +173,6 @@ void Game::setupGame()
 			{
 				break;
 			}
-			
 		}
 		if (ghosts >= MAX_GHOSTS)
 		{
@@ -236,6 +237,8 @@ void Game::setupFontAndText()
 		// Error loading font file
 	}
 	m_scoreText.setFont(m_arialFont);
+	m_livesText.setFont(m_arialFont);
+	m_livesText.setPosition(WINDOW_WIDTH / 2, 0.0f);
 
 	// Setup the game over text
 	m_gameOverText.setFont(m_arialFont);
