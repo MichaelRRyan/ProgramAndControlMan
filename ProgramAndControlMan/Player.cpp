@@ -30,49 +30,49 @@ void Player::setPos(sf::Vector2i t_pos)
 
 void Player::move(Direction t_direction, Cell t_maze[][MAX_COLS])
 {
-	if (t_direction == Direction::North)
-	{
-		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,characterHeight * 2,TILE_SIZE,characterHeight }); // Set the sprite to the look up texture
+	sf::Vector2i dirVector = Global::getDirectionVector(t_direction);
+	sf::Vector2i desiredPosition = m_pos + dirVector; // Get the desired position based on the current position and direction
 
-		if (t_maze[m_pos.y - 1][m_pos.x].getTileType() != Tile::Rock)
+	if (t_maze[desiredPosition.y][desiredPosition.x].getTileType() != Tile::Rock) // Move if not blocked by a rock
+	{
+		if (t_maze[desiredPosition.y][desiredPosition.x].getTileType() != Tile::Moveable) // Move if not blocked by a moveable block
 		{
-			m_pos.y--;
+			m_pos = desiredPosition; // Set the position to the desired one
+		}
+		else if (t_maze[desiredPosition.y + dirVector.y][desiredPosition.x + dirVector.x].getTileType() != Tile::Rock)
+		{
+			// Switch the tiles
+			t_maze[desiredPosition.y][desiredPosition.x].setTileType(t_maze[desiredPosition.y + dirVector.y][desiredPosition.x + dirVector.x].getTileType());
+			t_maze[desiredPosition.y + dirVector.y][desiredPosition.x + dirVector.x].setTileType(Tile::Moveable);
+			m_pos = desiredPosition; // Set the position to the desired one
 		}
 	}
-	else if (t_direction == Direction::South)
+
+	switch (t_direction) // Set the direction texture for the sprite
 	{
+	case Direction::North:
+		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,characterHeight * 2,TILE_SIZE,characterHeight }); // Set the sprite to the look up texture
+		break;
+	case Direction::South:
 		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,0,TILE_SIZE,characterHeight }); // Set the sprite to the look down texture
-		if (t_maze[m_pos.y + 1][m_pos.x].getTileType() != Tile::Rock)
-		{
-			m_pos.y++;
-		}
-	}
-	else if (t_direction == Direction::West)
-	{
-		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,characterHeight * 1,TILE_SIZE,characterHeight }); // Set the sprite to the look left texture
+		break;
+	case Direction::West:
 		m_body.setScale(-1.0f, 1.0f);
 		m_body.setOrigin(TILE_SIZE, m_body.getOrigin().y);
-		if (t_maze[m_pos.y][m_pos.x - 1].getTileType() != Tile::Rock)
-		{
-			m_pos.x--;
-		}
-	}
-	else if (t_direction == Direction::East)
-	{
-		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,characterHeight * 1,TILE_SIZE,characterHeight }); // Set the sprite to the look right texture
+		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,characterHeight * 1,TILE_SIZE,characterHeight }); // Set the sprite to the look left texture
+		break;
+	case Direction::East:
 		m_body.setScale(1.0f, 1.0f);
 		m_body.setOrigin(0.0f, m_body.getOrigin().y);
-		if (t_maze[m_pos.y][m_pos.x + 1].getTileType() != Tile::Rock)
-		{
-			m_pos.x++;
-		}
+		m_body.setTextureRect(sf::IntRect{ (TILE_SIZE + characterWidthMargin) * 2,characterHeight * 1,TILE_SIZE,characterHeight }); // Set the sprite to the look right texture
+		break;
 	}
 
 	m_body.setPosition(static_cast<sf::Vector2f>(m_pos * 32)); // Set the position to the current cell
 
-	if (t_maze[m_pos.y][m_pos.x].getTileType() == Tile::Coin)
+	if (t_maze[m_pos.y][m_pos.x].getTileType() == Tile::Coin) // If the cell contains a coin, pick it up
 	{
-		t_maze[m_pos.y][m_pos.x ].setTileType(Tile::None);
-		m_score++;
+		t_maze[m_pos.y][m_pos.x ].setTileType(Tile::None); // Remove coin
+		m_score++; // Add to score
 	}
 }

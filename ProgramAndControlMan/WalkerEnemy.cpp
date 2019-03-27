@@ -45,7 +45,8 @@ void WalkerEnemy::move(Cell t_maze[][MAX_COLS], WalkerEnemy t_ghosts[])
 			sf::Vector2i desiredPosition = m_pos + Global::getDirectionVector(m_moveDir); // Find the desired position from the current position and direction
 			bool blocked = false; // True if the desired position holds another enemy or wall
 
-			if (t_maze[desiredPosition.y][desiredPosition.x].getTileType() != Tile::Rock) // Check if there's a rock blocking movement
+			if (t_maze[desiredPosition.y][desiredPosition.x].getTileType() != Tile::Rock
+				&& t_maze[desiredPosition.y][desiredPosition.x].getTileType() != Tile::Moveable) // Check if there's a rock blocking movement
 			{
 				for (int i = 0; i < MAX_GHOSTS; i++) // Loop through other ghosts
 				{

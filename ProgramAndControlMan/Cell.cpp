@@ -20,5 +20,8 @@ void Cell::setTileType(Tile t_tileType)
 	case Tile::Coin:
 		m_texturePosition = sf::IntRect{ TILE_SIZE * 12,TILE_SIZE * 24,TILE_SIZE,TILE_SIZE };
 		break;
+	case Tile::Moveable:
+		m_texturePosition = sf::IntRect{ TILE_SIZE * 15,TILE_SIZE * 15,TILE_SIZE,TILE_SIZE };
+		break;
 	}
 }

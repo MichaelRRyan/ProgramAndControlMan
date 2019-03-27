@@ -25,6 +25,7 @@ enum class Tile
 	None,
 	Rock,
 	Coin,
+	Moveable
 };
 
 const int MAX_ROWS{ 25 };
