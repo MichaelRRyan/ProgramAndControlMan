@@ -6,11 +6,18 @@
 
 class WalkerEnemy
 {
-	// Declare public data members
+	// Declare private data members
+	const int MOVEMENT_TIME = 10;
+
 	sf::Texture m_spriteSheet;
 	sf::Sprite m_body;
 	sf::Vector2i m_pos;
 	Direction m_moveDir;
+	int moveTimer;
+
+	// Texture variables
+	int characterHeight;
+	int characterWidthMargin;
 
 public:
 	WalkerEnemy();
@@ -21,5 +28,6 @@ public:
 
 	void setPos(int t_row, int t_col);
 	void move(Cell t_maze[][MAX_COLS], WalkerEnemy t_ghosts[]);
+	void setTextureDirection(); // Set the correct texture for the direction the enemy is facing
 };
 

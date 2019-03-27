@@ -20,6 +20,13 @@ enum class GameState
 	GameOver
 };
 
+enum class Tile
+{
+	None,
+	Rock,
+	Coin,
+};
+
 const int MAX_ROWS{ 25 };
 const int MAX_COLS{ 25 };
 

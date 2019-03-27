@@ -3,24 +3,22 @@
 
 Cell::Cell()
 {
-	m_containsWall = false;
-	m_containsCoin = false;
+	m_tileType = Tile::None;
 }
 
-void Cell::setContainsWall(bool t_wall)
+void Cell::setTileType(Tile t_tileType)
 {
-	m_containsWall = t_wall;
-	if (t_wall)
+	m_tileType = t_tileType;
+
+	switch (t_tileType)
 	{
+	case Tile::None:
+		break;
+	case Tile::Rock:
 		m_texturePosition = sf::IntRect{ TILE_SIZE * 10,TILE_SIZE * 7,TILE_SIZE,TILE_SIZE };
-	}
-}
-
-void Cell::setContainsCoin(bool t_coin)
-{
-	m_containsCoin = t_coin;
-	if (t_coin)
-	{
+		break;
+	case Tile::Coin:
 		m_texturePosition = sf::IntRect{ TILE_SIZE * 12,TILE_SIZE * 24,TILE_SIZE,TILE_SIZE };
+		break;
 	}
 }

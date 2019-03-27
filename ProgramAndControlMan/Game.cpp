@@ -142,12 +142,12 @@ void Game::setupGame()
 	{
 		for (int col = 0; col < MAX_COLS; col++)
 		{
-			if (!m_maze[row][col].getContainsWall())
+			if (m_maze[row][col].getTileType() != Tile::Rock)
 			{
 				if (!found)
 				{
 					m_player.setPos({ col, row });
-					m_maze[row][col].setContainsCoin(false);
+					m_maze[row][col].setTileType(Tile::None);
 					found = true;
 				}
 			}
@@ -161,7 +161,7 @@ void Game::setupGame()
 		{
 			if (ghosts < MAX_GHOSTS)
 			{
-				if (!m_maze[row][col].getContainsWall())
+				if (m_maze[row][col].getTileType() != Tile::Rock)
 				{
 					m_ghosts[ghosts].setPos(row, col);
 					ghosts++;
@@ -182,27 +182,49 @@ void Game::setupGame()
 
 void Game::setupMaze()
 {
+	int mazeSetup[MAX_ROWS][MAX_COLS]{
+	{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
+	{ 0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0 },
+	{ 0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0 },
+	{ 0,0,1,1,0,1,1,0,0,1,1,0,0,1,1,1,0,0,1,1,0,1,1,0,0 },
+	{ 0,0,0,0,0,1,1,0,0,1,1,1,0,0,1,1,0,0,1,1,0,0,0,0,0 },
+	{ 0,1,1,1,0,0,0,0,0,1,1,1,1,0,0,1,0,0,0,0,0,1,1,1,0 },
+	{ 0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0 },
+	{ 0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0 },
+	{ 0,0,1,1,0,1,0,0,1,1,1,1,0,0,0,0,1,0,0,1,0,1,1,0,0 },
+	{ 0,0,1,1,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0 },
+	{ 0,0,1,1,0,1,0,0,1,1,0,1,1,1,0,0,0,0,0,1,0,1,1,0,0 },
+	{ 0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0 },
+	{ 0,0,1,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,1,0,1,1,0,0 },
+	{ 0,0,1,1,0,1,0,0,0,0,1,1,1,0,0,1,1,0,0,1,0,1,1,0,0 },
+	{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0 },
+	{ 0,0,1,1,0,1,0,0,1,0,0,0,0,1,1,1,1,0,0,1,0,1,1,0,0 },
+	{ 0,0,1,1,0,1,0,0,1,1,1,1,1,1,1,1,1,0,0,1,0,1,1,0,0 },
+	{ 0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0 },
+	{ 0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0 },
+	{ 0,1,1,1,1,0,0,0,0,1,0,0,1,1,1,1,0,0,0,0,1,1,1,1,0 },
+	{ 0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,0,0,0,0,0,0,0,0,0 },
+	{ 0,0,1,1,0,1,1,0,0,1,1,1,0,0,1,1,0,0,1,1,0,1,1,0,0 },
+	{ 0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0 },
+	{ 0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0 },
+	{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+	};
+
 	for (int row = 0; row < MAX_ROWS; row++)
 	{
 		for (int col = 0; col < MAX_COLS; col++)
 		{
-			// Reset all values before setting them
-			m_maze[row][col].setContainsCoin(false);
-			m_maze[row][col].setContainsWall(false);
+			m_maze[row][col].setTileType(static_cast<Tile>(mazeSetup[row][col]));
 
-			if (rand() % 5 == 0)
+			if (mazeSetup[row][col] == 0) // Set coins to any empty spots in the maze
 			{
-				m_maze[row][col].setContainsWall(true);
+				m_maze[row][col].setTileType(Tile::Coin);
 			}
-			else if (row == 0 || row == MAX_ROWS - 1 || col == 0 || col == MAX_COLS - 1)
+
+			if (row == 0 || row == MAX_ROWS - 1 || col == 0 || col == MAX_COLS - 1) // Setup the sides of the maze so that it always has borders
 			{
-				m_maze[row][col].setContainsWall(true);
+				m_maze[row][col].setTileType(Tile::Rock);
 			}
-			else
-			{
-				m_maze[row][col].setContainsCoin(true);
-			}
-			m_maze[row][col].setPosition({ 32.0f * col, 32.0f * row }); // Sets the position based on the row and column
 		}
 	}
 }
@@ -229,14 +251,15 @@ void Game::drawMaze()
 	{
 		for (int col = 0; col < MAX_COLS; col++)
 		{
-			m_tileSprite.setPosition(32 * col, 32 * row);
-			m_tileSprite.setTextureRect(sf::IntRect{ TILE_SIZE * 21, TILE_SIZE * 5, TILE_SIZE, TILE_SIZE });
-			m_window.draw(m_tileSprite);
+			m_tileSprite.setPosition(32 * col, 32 * row); // Set the x and y of the tile sprite
+			int grassType = (col + row) % 3; // Picks between grass tiles to draw for each tile based off the row and col
+			m_tileSprite.setTextureRect(sf::IntRect{ TILE_SIZE * (21 + grassType), TILE_SIZE * 5, TILE_SIZE, TILE_SIZE }); // Set the ground tile
+			m_window.draw(m_tileSprite); // Draw the ground
 
-			if (m_maze[row][col].getContainsCoin() || m_maze[row][col].getContainsWall())
+			if (m_maze[row][col].getTileType() == Tile::Rock || m_maze[row][col].getTileType() == Tile::Coin) // Draw a rock or coin if the cell contains one
 			{
-				m_tileSprite.setTextureRect(m_maze[row][col].getTexturePosition());
-				m_window.draw(m_tileSprite);
+				m_tileSprite.setTextureRect(m_maze[row][col].getTexturePosition()); // Set the sprite to the cell type
+				m_window.draw(m_tileSprite); // Draw the cell
 			}
 		}
 	}
