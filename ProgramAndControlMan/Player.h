@@ -46,6 +46,7 @@ public:
 	inline int getLives() { return m_lives; } // Returns the lives of the player
 
 	void move(Direction t_direction, Cell t_maze[][MAX_COLS]);
+	void setTextureDirection(Direction t_direction);
 	void update(Cell t_maze[][MAX_COLS], GameState &t_gameState);
 	void checkCollision(WalkerEnemy &t_enemy);
 };

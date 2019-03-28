@@ -27,6 +27,7 @@ void WalkerEnemy::setPos(int t_row, int t_col)
 	m_pos.x = t_col;
 	m_pos.y = t_row;
 
+	m_previousPos = m_pos;
 	m_body.setPosition(static_cast<sf::Vector2f>(m_pos * 32)); // Set the position to the current cell
 }
 

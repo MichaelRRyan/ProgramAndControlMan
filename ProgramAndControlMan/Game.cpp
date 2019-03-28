@@ -23,6 +23,10 @@ Game::~Game()
 
 }
 
+/// <summary>
+/// <para>Manage the framerate for the game.</para>
+/// <para>Calls the processEvents, update, and render function in their respective time.</para>
+/// </summary>
 void Game::run()
 {
 	sf::Clock clock;
@@ -43,6 +47,12 @@ void Game::run()
 	}
 }
 
+/// <summary>
+/// <para>Process all user events for the game.</para>
+/// <para>Manages restarting the game if the user
+/// presses 'R' once the game is over</para>
+/// <para>Calls the menu screen to manage the screens.</para>
+/// </summary>
 void Game::processEvents()
 {
 	sf::Event nextEvent;
@@ -72,6 +82,13 @@ void Game::processEvents()
 	}
 }
 
+/// <summary>
+/// <para>Update the game world.</para>
+/// <para>Checks if exitGame bool is true and closes window.</para>
+/// <para>Updates the enemies and player and checks their collisions.</para>
+/// <para>Updates the score and health text.</para>
+/// </summary>
+/// <param name="t_deltaTime">Time per frame</param>
 void Game::update(sf::Time t_deltaTime)
 {
 	if (m_exitGame)
@@ -94,6 +111,10 @@ void Game::update(sf::Time t_deltaTime)
 	}
 }
 
+/// <summary>
+/// <para>Draws all game objects.</para>
+/// <para>Draws each game object according to the game state.</para>
+/// </summary>
 void Game::render()
 {
 	m_window.clear();
@@ -126,54 +147,27 @@ void Game::render()
 	m_window.display();
 }
 
+/// <summary>
+/// <para>Sets up the game objects.</para>
+/// <para>Sets up the player and enemies.</para>
+/// </summary>
 void Game::setupGame()
 {
 	m_player.setScore(0);
 	m_player.setLives(3);
 
-	bool found = false; // Whether the player has been placed or not
-	int ghosts = 0;
-	for (int row = 0; row < MAX_ROWS; row++)
-	{
-		for (int col = 0; col < MAX_COLS; col++)
-		{
-			if (m_maze[row][col].getTileType() != Tile::Rock)
-			{
-				if (!found)
-				{
-					m_player.setPos({ col, row });
-					m_maze[row][col].setTileType(Tile::None);
-					found = true;
-				}
-			}
-		}
-	}
+	m_player.setPos({ 12, 2 });
+	m_maze[1][1].setTileType(Tile::None);
 
-	// Loop backwards through the maze to place the ghosts
-	for (int row = MAX_ROWS - 1; row >= 0; row--)
-	{
-		for (int col = MAX_COLS - 1; col  >= 0; col--)
-		{
-			if (ghosts < MAX_GHOSTS)
-			{
-				if (m_maze[row][col].getTileType() != Tile::Rock)
-				{
-					m_ghosts[ghosts].setPos(row, col);
-					ghosts++;
-				}
-			}
-			else
-			{
-				break;
-			}
-		}
-		if (ghosts >= MAX_GHOSTS)
-		{
-			break;
-		}
-	}
+	m_ghosts[0].setPos(4, 4); // Set the enemy to the top left corner of the maze
+	m_ghosts[1].setPos(MAX_COLS - 5, 4); // Set the enemy to the top right corner of the maze
+	m_ghosts[2].setPos(4, MAX_ROWS - 4); // Set the enemy to the bottom left of the maze
+	m_ghosts[3].setPos(MAX_COLS - 5, MAX_ROWS - 5); // Set the enemy to botton right of the maze
 }
 
+/// <summary>
+/// <para>Setup the maze array with a temporary maze.</para>
+/// </summary>
 void Game::setupMaze()
 {
 	int mazeSetup[MAX_ROWS][MAX_COLS]{
@@ -223,6 +217,9 @@ void Game::setupMaze()
 	}
 }
 
+/// <summary>
+/// <para>Loads the font file and sets up the text objects.</para>
+/// </summary>
 void Game::setupFontAndText()
 {
 	if (!m_arialFont.loadFromFile("ASSETS\\FONTS\\arial.ttf"))
@@ -241,6 +238,9 @@ void Game::setupFontAndText()
 	m_gameOverText.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
 }
 
+/// <summary>
+/// <para>Draws each cell of the maze and the background.</para>
+/// </summary>
 void Game::drawMaze()
 {
 	for (int row = 0; row < MAX_ROWS; row++)
