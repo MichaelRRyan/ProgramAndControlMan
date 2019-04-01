@@ -28,7 +28,6 @@ private:
 	void setupMaze();
 	void setupFontAndText();
 	void drawMaze();
-	Direction checkMovementInput(sf::Event t_nextEvent);
 
 	sf::RenderWindow m_window;
 	bool m_exitGame;

@@ -3,6 +3,9 @@
 #include <SFML\Graphics.hpp>
 #include "Globals.h"
 #include "Cell.h"
+#include "Player.h"
+
+class Player;
 
 class WalkerEnemy
 {
@@ -15,6 +18,8 @@ class WalkerEnemy
 	sf::Vector2i m_previousPos; // Used for animation
 	Direction m_moveDir;
 	int m_moveTimer;
+	int sightRange;
+	bool followingPlayer;
 
 	// Texture variables
 	sf::Vector2i m_characterNumber;
@@ -30,7 +35,8 @@ public:
 	inline void setMoveTimer(int t_moveDelay) { m_moveTimer = t_moveDelay; } // Set the delay between movements
 	void setPos(int t_row, int t_col);
 
-	void move(Cell t_maze[][MAX_COLS], WalkerEnemy t_ghosts[]);
+	void move(Cell t_maze[][MAX_COLS], WalkerEnemy t_ghosts[], Player t_player); // Move the enemy if not blocked by an enemy or wall
 	void setTextureDirection(); // Set the correct texture for the direction the enemy is facing
+	void checkForPlayer(Cell t_maze[][MAX_COLS], Player t_player); // Check if the player is within the sight range of the enemy
 };
 

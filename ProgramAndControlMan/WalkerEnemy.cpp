@@ -1,14 +1,23 @@
 #include "WalkerEnemy.h"
 
 
-
+/// <summary>
+/// <para>Enemy default constructer.</para>
+/// <para>Load texture files, set the move direction, set the move timer,</para>
+/// <para>set the sight range and following player bool</para>
+/// </summary>
 WalkerEnemy::WalkerEnemy()
 {
 	loadFiles();
 	m_moveDir = static_cast<Direction>(rand() % 4 + 1);
 	m_moveTimer = 0;
+	sightRange = 5; // Enemy can see the player five tiles away
+	followingPlayer = false;
 }
 
+/// <summary>
+/// Load the texture file and apply it to the sprite.
+/// </summary>
 void WalkerEnemy::loadFiles()
 {
 	m_characterNumber = { CHAR_SPACING, CHAR_HEIGHT * 3 };
@@ -19,23 +28,41 @@ void WalkerEnemy::loadFiles()
 	}
 	m_body.setTexture(m_spriteSheet);
 	m_body.setTextureRect(sf::IntRect{ m_characterNumber.x * 2,m_characterNumber.y,CHAR_WIDTH,CHAR_HEIGHT });
-	m_body.setOrigin(0, CHAR_WIDTH);
+	m_body.setOrigin(0.0f, static_cast<float>(CHAR_WIDTH));
 }
 
+/// <summary>
+/// <para>Set the row and column of the enemy.</para>
+/// <para>Set the previous position and the sprite position.</para>
+/// </summary>
+/// <param name="t_row">Row</param>
+/// <param name="t_col">Column</param>
 void WalkerEnemy::setPos(int t_row, int t_col)
 {
-	m_pos.x = t_col;
-	m_pos.y = t_row;
+	m_pos.x = t_col; // Set the column
+	m_pos.y = t_row; // Set the row
 
-	m_previousPos = m_pos;
+	m_previousPos = m_pos; // Set the previous position for animation
 	m_body.setPosition(static_cast<sf::Vector2f>(m_pos * 32)); // Set the position to the current cell
 }
 
-void WalkerEnemy::move(Cell t_maze[][MAX_COLS], WalkerEnemy t_ghosts[])
+/// <summary>
+/// <para>Move the enemy in its current move direction.</para>
+/// <para>Checks each frame for a player and switch direction if found</para>
+/// <para>Enemy has a one in six chance to change direction randomly.</para>
+/// <para>Checks that the path isn't blocked by a wall or an enemy.</para>
+/// <para>Changes direction if blocked, move in direction if not.</para>
+/// <para>Set the texture direction and move timer.</para>
+/// </summary>
+/// <param name="t_maze"></param>
+/// <param name="t_ghosts"></param>
+void WalkerEnemy::move(Cell t_maze[][MAX_COLS], WalkerEnemy t_ghosts[], Player t_player)
 {
+	checkForPlayer(t_maze, t_player); // Check for player
+	
 	if (m_moveTimer <= 0) // The enemy can only move once its timer reaches zero
 	{
-		if (rand() % 6 == 0) // One in six chance each movement frames to change direction
+		if (rand() % 6 == 0 && !followingPlayer) // One in six chance each movement frames to change direction if not found player
 		{
 			m_moveDir = static_cast<Direction>(rand() % 4 + 1); // Find a new direction
 		}
@@ -109,7 +136,7 @@ void WalkerEnemy::setTextureDirection()
 	case Direction::West: // Set the sprite to the look left texture
 		m_characterDirection = 1;
 		m_body.setScale(-1.0f, 1.0f);
-		m_body.setOrigin(CHAR_WIDTH, m_body.getOrigin().y);
+		m_body.setOrigin(static_cast<float>(CHAR_WIDTH), m_body.getOrigin().y);
 		break;
 	case Direction::East: // Set the sprite to the look right texture
 		m_characterDirection = 1;
@@ -120,3 +147,52 @@ void WalkerEnemy::setTextureDirection()
 		break;
 	}
 }
+
+/// <summary>
+/// <para>Checks north, south, east and west within the sight range for the player</para>
+/// <para>and sets the direction and following player bool if found.</para>
+/// </summary>
+/// <param name="t_maze"></param>
+void WalkerEnemy::checkForPlayer(Cell t_maze[][MAX_COLS], Player t_player)
+{
+	bool followingPlayer = false;
+	Direction checkDirection = Direction::North; // Set the check direction to begin with north
+
+	for (int i = 0; i < 4; i++) // Check in each direction
+	{
+		for (int j = 1; j <= sightRange; j++) // Check for player in current direction
+		{
+			// Get the check direction by the direction vector multiplied by the iteration and current position 
+			sf::Vector2i checkPosition = m_pos + (Global::getDirectionVector(checkDirection) * j);
+
+			if (t_maze[checkPosition.y][checkPosition.x].getTileType() == Tile::Rock
+				|| t_maze[checkPosition.y][checkPosition.x].getTileType() == Tile::Moveable)
+			{
+				break; // Wall blocking sight, break from loop
+			}
+			else if (t_player.getPos() == checkPosition) // Check for player
+			{
+				followingPlayer = true; // Now following player
+				m_moveDir = checkDirection; // Set the move direction to the current check direction
+				break; // Break out of the loop
+			}
+		} // End for (tile)
+
+		if (followingPlayer) // Break if already found the player
+			break;
+
+		switch (checkDirection) // Switch to the next direction to check
+		{
+		case Direction::North:
+			checkDirection = Direction::South;
+			break;
+		case Direction::South:
+			checkDirection = Direction::West;
+			break;
+		case Direction::West:
+			checkDirection = Direction::East;
+			break;
+		}
+	} // End for (direction)
+}
+

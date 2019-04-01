@@ -2,9 +2,14 @@
 #pragma once
 
 #include <SFML\Graphics.hpp>
+#include <string>
+#include <fstream>
+#include <iostream>
 #include "Globals.h"
 #include "Cell.h"
 #include "WalkerEnemy.h"
+
+class WalkerEnemy;
 
 class Player
 {
@@ -49,5 +54,7 @@ public:
 	void setTextureDirection(Direction t_direction);
 	void update(Cell t_maze[][MAX_COLS], GameState &t_gameState);
 	void checkCollision(WalkerEnemy &t_enemy);
+
+	void saveScoreToFile();
 };
 

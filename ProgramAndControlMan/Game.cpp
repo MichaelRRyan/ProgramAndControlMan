@@ -101,7 +101,7 @@ void Game::update(sf::Time t_deltaTime)
 		for (int i = 0; i < MAX_GHOSTS; i++)
 		{
 			m_player.checkCollision(m_ghosts[i]);
-			m_ghosts[i].move(m_maze, m_ghosts);
+			m_ghosts[i].move(m_maze, m_ghosts, m_player);
 		}
 
 		m_scoreText.setString(m_playerName + "'s Score: " + std::to_string(m_player.getScore()));
@@ -157,7 +157,7 @@ void Game::setupGame()
 	m_player.setLives(3);
 
 	m_player.setPos({ 12, 2 });
-	m_maze[1][1].setTileType(Tile::None);
+	m_maze[2][12].setTileType(Tile::None);
 
 	m_ghosts[0].setPos(4, 4); // Set the enemy to the top left corner of the maze
 	m_ghosts[1].setPos(MAX_COLS - 5, 4); // Set the enemy to the top right corner of the maze

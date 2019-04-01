@@ -36,7 +36,7 @@ void Player::loadFiles()
 
 	m_body.setTexture(m_spriteSheet); // Set the player texture
 	m_body.setTextureRect(sf::IntRect{ CHAR_SPACING * 2,0,CHAR_WIDTH,CHAR_HEIGHT }); // Set the base character texture rectangle
-	m_body.setOrigin(0, CHAR_WIDTH); // Set he origin of the player to ignore the top of the sprite
+	m_body.setOrigin(0.0f, static_cast<float>(CHAR_WIDTH)); // Set he origin of the player to ignore the top of the sprite
 }
 
 /// <summary>
@@ -123,7 +123,7 @@ void Player::setTextureDirection(Direction t_direction)
 		break;
 	case Direction::West:
 		m_body.setScale(-1.0f, 1.0f);
-		m_body.setOrigin(CHAR_WIDTH, m_body.getOrigin().y);
+		m_body.setOrigin(static_cast<float>(CHAR_WIDTH), m_body.getOrigin().y);
 		m_characterDirection = 1;
 		break;
 	case Direction::East:
@@ -204,5 +204,36 @@ void Player::checkCollision(WalkerEnemy & t_enemy)
 		m_lives--; // Decrement the lives
 		m_hurtTimer = MAX_HURT_TIME; // Set the hurt timer for temporary invincibilty
 		m_body.setColor(sf::Color::Red); // Set the player colour to red to show injury
+	}
+}
+
+/// <summary>
+/// Save the score to a file if it's within the top ten scores.
+/// </summary>
+void Player::saveScoreToFile()
+{
+	std::string names[MAX_PLAYERS];
+	int scores[MAX_PLAYERS];
+	int characterNums[MAX_PLAYERS];
+
+	bool foundFile = false;
+	std::ifstream inputFile;
+	inputFile.open("Data//scoreboard.txt");
+
+	if (inputFile.is_open())
+	{
+		while (!inputFile.eof())
+		{
+			std::string line;
+
+
+		}
+
+		inputFile.close();
+	}
+	else
+	{
+		foundFile = false;
+		std::cout << "Could not open scoreboard file.";
 	}
 }
