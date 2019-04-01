@@ -70,7 +70,8 @@ void Game::processEvents()
 				{
 					setupMaze();
 					setupGame();
-					m_gameState = GameState::Gameplay;
+					m_playerName = "";
+					m_gameState = GameState::MenuScreen;
 				}
 			}
 		}
@@ -78,6 +79,13 @@ void Game::processEvents()
 			|| m_gameState == GameState::NameScreen || m_gameState == GameState::CharacterScreen)
 		{
 			m_menuScreens.processEvents(nextEvent, m_gameState, m_playerName, m_exitGame, m_player);
+		}
+		if (sf::Event::KeyPressed == nextEvent.type)
+		{
+			if (sf::Keyboard::Comma == nextEvent.key.code)
+			{
+				m_player.saveScoreToFile(m_playerName);
+			}
 		}
 	}
 }
@@ -123,11 +131,22 @@ void Game::render()
 	{
 	case GameState::Gameplay:
 		drawMaze();
-		m_window.draw(m_player.getBody());
 
-		for (int i = 0; i < MAX_GHOSTS; i++)
+		// Loop through all rows to draw players and enemies in order of screen height
+		for (int row = 0; row < MAX_ROWS; row++)
 		{
-			m_window.draw(m_ghosts[i].getBody());
+			for (int i = 0; i < MAX_GHOSTS; i++) // Loop through all the ghosts
+			{
+				if (m_ghosts[i].getPos().y == row) // Check if the ghost is on this row
+				{
+					m_window.draw(m_ghosts[i].getBody());
+				}
+			}
+
+			if (m_player.getPos().y == row) // Check if the player is on this row
+			{
+				m_window.draw(m_player.getBody());
+			}
 		}
 
 		m_window.draw(m_scoreText);
@@ -153,10 +172,7 @@ void Game::render()
 /// </summary>
 void Game::setupGame()
 {
-	m_player.setScore(0);
-	m_player.setLives(3);
-
-	m_player.setPos({ 12, 2 });
+	m_player.respawn();
 	m_maze[2][12].setTileType(Tile::None);
 
 	m_ghosts[0].setPos(4, 4); // Set the enemy to the top left corner of the maze
@@ -227,8 +243,9 @@ void Game::setupFontAndText()
 		// Error loading font file
 	}
 	m_scoreText.setFont(m_arialFont);
+	m_scoreText.setPosition(0.0f, static_cast<float>(WINDOW_HEIGHT - 45));
 	m_livesText.setFont(m_arialFont);
-	m_livesText.setPosition(WINDOW_WIDTH / 2, 0.0f);
+	m_livesText.setPosition(static_cast<float>(WINDOW_WIDTH / 2 + 50), static_cast<float>(WINDOW_HEIGHT - 45));
 
 	// Setup the game over text
 	m_gameOverText.setFont(m_arialFont);

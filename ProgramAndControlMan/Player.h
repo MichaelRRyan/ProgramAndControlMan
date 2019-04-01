@@ -5,9 +5,11 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include "Globals.h"
 #include "Cell.h"
 #include "WalkerEnemy.h"
+
 
 class WalkerEnemy;
 
@@ -30,12 +32,14 @@ class Player
 	// Texture and animation
 	sf::Vector2i m_characterPositions[MAX_CHARACTERS]; // The base position of each character on the sprite sheet for the player to choose from
 	int m_characterDirection;
-	sf::Vector2i m_characterNumber; // The number of pixels from the top left of the sprite sheet to reach the player sprite
+	int m_characterNumber; // The character number
+	sf::Vector2i m_character; // The number of pixels from the top left of the sprite sheet to reach the player sprite
 
 public:
 	// Declare public function members
 	Player();
 	void loadFiles();
+	void respawn();
 
 	void setPos(sf::Vector2i t_pos); // Set the row and column position of the player
 	inline void setScore(int t_score) { m_score = t_score; }
@@ -55,6 +59,9 @@ public:
 	void update(Cell t_maze[][MAX_COLS], GameState &t_gameState);
 	void checkCollision(WalkerEnemy &t_enemy);
 
-	void saveScoreToFile();
+	void saveScoreToFile(std::string t_playerName);
+	void readScore(std::string t_names[], int t_scores[], int t_characterNums[]);
+	void addScore(std::string t_names[], int t_scores[], int t_characterNums[], std::string t_playerName);
+	void writeScore(std::string t_names[], int t_scores[], int t_characterNums[]);
 };
 

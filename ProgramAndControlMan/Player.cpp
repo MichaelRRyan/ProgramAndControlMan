@@ -17,11 +17,7 @@ Player::Player() :
 {
 	// Initialise the player variables
 	loadFiles();
-	m_score = 0;
-	m_hurtTimer = 0;
-	m_moveTimer = 0;
-	m_characterDirection = 0;
-	m_lives = 3;
+	respawn();
 }
 
 /// <summary>
@@ -37,6 +33,22 @@ void Player::loadFiles()
 	m_body.setTexture(m_spriteSheet); // Set the player texture
 	m_body.setTextureRect(sf::IntRect{ CHAR_SPACING * 2,0,CHAR_WIDTH,CHAR_HEIGHT }); // Set the base character texture rectangle
 	m_body.setOrigin(0.0f, static_cast<float>(CHAR_WIDTH)); // Set he origin of the player to ignore the top of the sprite
+}
+
+/// <summary>
+/// Setup the initial and respawn player values.
+/// </summary>
+void Player::respawn()
+{
+	m_score = 0;
+	m_hurtTimer = 0;
+	m_moveTimer = 0;
+	m_characterDirection = 0;
+	m_characterNumber = 0;
+	m_lives = 3;
+	setPos({ 12, 2 });
+	m_body.setTextureRect(sf::IntRect{ m_character.x + CHAR_SPACING,m_character.y,CHAR_WIDTH,CHAR_HEIGHT });
+	m_body.setColor(sf::Color::White);
 }
 
 /// <summary>
@@ -58,11 +70,11 @@ void Player::setPos(sf::Vector2i t_pos)
 /// <param name="t_characterNum"></param>
 void Player::setCharacter(int t_characterNum)
 {
-	int charNum = t_characterNum % MAX_CHARACTERS; // Manage overflow
-	if (charNum < 0) // Manage underflow
-		charNum = MAX_CHARACTERS + charNum;
-	m_characterNumber = m_characterPositions[charNum]; // Set the correct index
-	m_body.setTextureRect(sf::IntRect{ m_characterNumber.x + CHAR_SPACING,m_characterNumber.y,CHAR_WIDTH,CHAR_HEIGHT }); // Set the texture to the sprite
+	m_characterNumber = t_characterNum % MAX_CHARACTERS; // Manage overflow
+	if (m_characterNumber < 0) // Manage underflow
+		m_characterNumber = MAX_CHARACTERS + m_characterNumber;
+	m_character = m_characterPositions[m_characterNumber]; // Set the correct index
+	m_body.setTextureRect(sf::IntRect{ m_character.x + CHAR_SPACING,m_character.y,CHAR_WIDTH,CHAR_HEIGHT }); // Set the texture to the sprite
 }
 
 /// <summary>
@@ -164,7 +176,7 @@ void Player::update(Cell t_maze[][MAX_COLS], GameState & t_gameState)
 		}
 
 		// Set the standing sprite of the player
-		m_body.setTextureRect(sf::IntRect{ m_characterNumber.x + CHAR_SPACING,m_characterNumber.y + m_characterDirection * CHAR_HEIGHT,CHAR_WIDTH,CHAR_HEIGHT });
+		m_body.setTextureRect(sf::IntRect{ m_character.x + CHAR_SPACING,m_character.y + m_characterDirection * CHAR_HEIGHT,CHAR_WIDTH,CHAR_HEIGHT });
 	}
 	else
 	{
@@ -175,7 +187,7 @@ void Player::update(Cell t_maze[][MAX_COLS], GameState & t_gameState)
 		m_body.setPosition(static_cast<float>(newX), static_cast<float>(newY)); // Set the position to the current cell
 
 		int frameNum = static_cast<int>((1.0 * m_moveTimer / MOVEMENT_TIME) * 3); // Work out the animation frame number based off the movement timer
-		m_body.setTextureRect(sf::IntRect{ m_characterNumber.x + (CHAR_SPACING * frameNum), m_characterNumber.y + (m_characterDirection * CHAR_HEIGHT),CHAR_WIDTH, CHAR_HEIGHT });
+		m_body.setTextureRect(sf::IntRect{ m_character.x + (CHAR_SPACING * frameNum), m_character.y + (m_characterDirection * CHAR_HEIGHT),CHAR_WIDTH, CHAR_HEIGHT });
 	}
 
 	if (m_hurtTimer > 0) // Decrement the hurt timer if it's greater than 0
@@ -210,30 +222,145 @@ void Player::checkCollision(WalkerEnemy & t_enemy)
 /// <summary>
 /// Save the score to a file if it's within the top ten scores.
 /// </summary>
-void Player::saveScoreToFile()
+void Player::saveScoreToFile(std::string t_playerName)
 {
-	std::string names[MAX_PLAYERS];
-	int scores[MAX_PLAYERS];
-	int characterNums[MAX_PLAYERS];
+	std::string names[MAX_PLAYERS]; // Setup the name string array
+	int scores[MAX_PLAYERS]; // Setup the scores array
+	int characterNums[MAX_PLAYERS]; // Setup the character numbers array
 
-	bool foundFile = false;
-	std::ifstream inputFile;
-	inputFile.open("Data//scoreboard.txt");
+	readScore(names, scores, characterNums); // Read in data from the scoreboard file
+	addScore(names, scores, characterNums, t_playerName); // Add the player score to the arrays if the score fits in the top 10
+	writeScore(names, scores, characterNums); // Write the arrays back to the file
+}
 
-	if (inputFile.is_open())
+/// <summary>
+/// Read from the player scores file and save the data to a set of arrays.
+/// </summary>
+/// <param name="t_names">Names array</param>
+/// <param name="t_scores">Scores array</param>
+/// <param name="t_characterNums">Character number array</param>
+void Player::readScore(std::string t_names[], int t_scores[], int t_characterNums[])
+{
+	std::ifstream inputFile; // Create the file pointer
+	inputFile.open("Data//scoreboard.txt"); // Open the file
+
+	if (inputFile.is_open()) // Check that the file has opened successfully
 	{
-		while (!inputFile.eof())
+		std::string line; // Holds one line (one player) of data
+		std::string item; // Holds one item of data
+		int lineNum = 0; // The current line number
+
+		while (std::getline(inputFile, line)) // Loop while getting lines to sort through
 		{
-			std::string line;
+			std::stringstream line_ss(line); // Create a string stream to sort through data
+			int dataNum = 0; // The current data number
 
+			while (std::getline(line_ss, item, ',')) // Loop through each piece of data of a line
+			{
+				if (item != "") // Make sure the item isn't empty
+				{
+					if (dataNum == 0) // Names
+					{
+						t_names[lineNum] = item;
+					}
+					else if (dataNum == 1) // Scores
+					{
+						t_scores[lineNum] = std::stoi(item);
+					}
+					else if (dataNum == 2) // Character number
+					{
+						t_characterNums[lineNum] = std::stoi(item);
+					}
+				}
+				else
+				{
+					break; // Break if the data is blank
+				}
+				dataNum++; // Increment the data number
+			} // End item loop
 
-		}
+			lineNum++; // Increment the the line number
+			if (lineNum >= MAX_PLAYERS)
+			{
+				break; // If the line number goes over the max number of player, break out
+			}
+		} // End line loop
 
-		inputFile.close();
+		inputFile.close(); // Close the file
+#ifdef _DEBUG
+		std::cout << "File read success!" << std::endl; // Output that the file write was a success
+#endif // DEBUG
 	}
+#ifdef _DEBUG
 	else
 	{
-		foundFile = false;
-		std::cout << "Could not open scoreboard file.";
+		std::cout << "Could not open scoreboard file." << std::endl; // Display an error if the file didn't open
 	}
+#endif // DEBUG
+}
+
+/// <summary>
+/// <para>Adds the players score to a set of local arrays if it's higher</para>
+/// <para>than any of the current scores.</para>
+/// </summary>
+/// <param name="t_names">Names array</param>
+/// <param name="t_scores">Scores array</param>
+/// <param name="t_characterNums">Character number</param>
+/// <param name="t_playerName">Player name</param>
+void Player::addScore(std::string t_names[], int t_scores[], int t_characterNums[], std::string t_playerName)
+{
+	for (int i = 0; i < MAX_PLAYERS; i++) // Loop through the player data arrays
+	{
+		if (m_score > t_scores[i]) // If the player score is greater than the current score
+		{
+			for (int j = MAX_PLAYERS - 1; j > i; j--) // Loop backwards through the array to move all items back
+			{
+				t_names[j] = t_names[j - 1]; // Move the name back one cell
+				t_scores[j] = t_scores[j - 1]; // Move the score back one cell
+				t_characterNums[j] = t_characterNums[j - 1]; // Move the character number
+			}
+			t_names[i] = t_playerName; // Set the player name to the cell
+			t_scores[i] = m_score; // Set the player score to the cell
+			t_characterNums[i] = m_characterNumber; // Set the player character number to the cell
+			break; // Break once player data is placed
+		}
+	}
+}
+
+/// <summary>
+/// Writes the player data arrays to a text file.
+/// </summary>
+/// <param name="t_names">Names array</param>
+/// <param name="t_scores">Scores array</param>
+/// <param name="t_characterNums">Character number array</param>
+void Player::writeScore(std::string t_names[], int t_scores[], int t_characterNums[])
+{
+	std::ofstream outputFile; // Create an output file pointer
+	outputFile.open("DATA//scoreboard.txt"); // Open the file
+
+	if (outputFile.is_open()) // Check the file is open
+	{
+		for (int i = 0; i < MAX_PLAYERS; i++) // Loop through the player data array
+		{
+			if (t_names[i] == "") // Check if the cell is blank
+			{
+				break; // Break if the name is blank
+			}
+			outputFile << t_names[i] << ","; // Write the current name to the file
+			outputFile << t_scores[i] << ","; // Write the current score to the file
+			outputFile << t_characterNums[i] << ","; // Write the current character number to a file
+			outputFile << std::endl; // Add a line break to the file
+		}
+
+		outputFile.close(); // Close the file
+#ifdef _DEBUG
+		std::cout << "File write success!" << std::endl; // Output that the file write was a success
+#endif // DEBUG
+	}
+#ifdef _DEBUG
+	else
+	{
+		std::cout << "Error opening file." << std::endl; // Output an error if the file cannot open
+	}
+#endif // DEBUG
 }
