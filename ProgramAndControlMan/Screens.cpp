@@ -311,3 +311,144 @@ void Screens::draw(sf::RenderWindow & t_window, GameState t_gameState, std::stri
 	t_window.draw(m_titleText);
 }
 
+/// <summary>
+/// Save the score to a file if it's within the top ten scores.
+/// </summary>
+void Screens::saveScoreToFile(std::string t_playerName, int t_playerScore, int t_playerCharNum)
+{
+	readScore(); // Read in data from the scoreboard file
+	addScore(t_playerName, t_playerScore, t_playerCharNum); // Add the player score to the arrays if the score fits in the top 10
+	writeScore(); // Write the arrays back to the file
+}
+
+/// <summary>
+/// Read from the player scores file and save the data to a set of arrays.
+/// </summary>
+/// <param name="t_names">Names array</param>
+/// <param name="t_scores">Scores array</param>
+/// <param name="t_characterNums">Character number array</param>
+void Screens::readScore()
+{
+	std::ifstream inputFile; // Create the file pointer
+	inputFile.open("Data//scoreboard.txt"); // Open the file
+
+	if (inputFile.is_open()) // Check that the file has opened successfully
+	{
+		std::string line; // Holds one line (one player) of data
+		std::string item; // Holds one item of data
+		int lineNum = 0; // The current line number
+
+		while (std::getline(inputFile, line)) // Loop while getting lines to sort through
+		{
+			std::stringstream line_ss(line); // Create a string stream to sort through data
+			int dataNum = 0; // The current data number
+
+			while (std::getline(line_ss, item, ',')) // Loop through each piece of data of a line
+			{
+				if (item != "") // Make sure the item isn't empty
+				{
+					if (dataNum == 0) // Names
+					{
+						m_names[lineNum] = item;
+					}
+					else if (dataNum == 1) // Scores
+					{
+						m_scores[lineNum] = std::stoi(item);
+					}
+					else if (dataNum == 2) // Character number
+					{
+						m_characterNums[lineNum] = std::stoi(item);
+					}
+				}
+				else
+				{
+					break; // Break if the data is blank
+				}
+				dataNum++; // Increment the data number
+			} // End item loop
+
+			lineNum++; // Increment the the line number
+			if (lineNum >= MAX_PLAYERS)
+			{
+				break; // If the line number goes over the max number of player, break out
+			}
+		} // End line loop
+
+		inputFile.close(); // Close the file
+#ifdef _DEBUG
+		std::cout << "File read success!" << std::endl; // Output that the file write was a success
+#endif // DEBUG
+	}
+#ifdef _DEBUG
+	else
+	{
+		std::cout << "Could not open scoreboard file." << std::endl; // Display an error if the file didn't open
+	}
+#endif // DEBUG
+}
+
+/// <summary>
+/// <para>Adds the players score to a set of local arrays if it's higher</para>
+/// <para>than any of the current scores.</para>
+/// </summary>
+/// <param name="t_names">Names array</param>
+/// <param name="t_scores">Scores array</param>
+/// <param name="t_characterNums">Character number</param>
+/// <param name="t_playerName">Player name</param>
+void Screens::addScore(std::string t_playerName, int t_playerScore, int t_playerCharNum)
+{
+	for (int i = 0; i < MAX_PLAYERS; i++) // Loop through the player data arrays
+	{
+		if (t_playerScore > m_scores[i]) // If the player score is greater than the current score
+		{
+			for (int j = MAX_PLAYERS - 1; j > i; j--) // Loop backwards through the array to move all items back
+			{
+				m_names[j] = m_names[j - 1]; // Move the name back one cell
+				m_scores[j] = m_scores[j - 1]; // Move the score back one cell
+				m_characterNums[j] = m_characterNums[j - 1]; // Move the character number
+			}
+			m_names[i] = t_playerName; // Set the player name to the cell
+			m_scores[i] = t_playerScore; // Set the player score to the cell
+			m_characterNums[i] = t_playerCharNum; // Set the player character number to the cell
+			break; // Break once player data is placed
+		}
+	}
+}
+
+/// <summary>
+/// Writes the player data arrays to a text file.
+/// </summary>
+/// <param name="t_names">Names array</param>
+/// <param name="t_scores">Scores array</param>
+/// <param name="t_characterNums">Character number array</param>
+void Screens::writeScore()
+{
+	std::ofstream outputFile; // Create an output file pointer
+	outputFile.open("DATA//scoreboard.txt"); // Open the file
+
+	if (outputFile.is_open()) // Check the file is open
+	{
+		for (int i = 0; i < MAX_PLAYERS; i++) // Loop through the player data array
+		{
+			if (m_names[i] == "") // Check if the cell is blank
+			{
+				break; // Break if the name is blank
+			}
+			outputFile << m_names[i] << ","; // Write the current name to the file
+			outputFile << m_scores[i] << ","; // Write the current score to the file
+			outputFile << m_characterNums[i] << ","; // Write the current character number to a file
+			outputFile << std::endl; // Add a line break to the file
+		}
+
+		outputFile.close(); // Close the file
+#ifdef _DEBUG
+		std::cout << "File write success!" << std::endl; // Output that the file write was a success
+#endif // DEBUG
+	}
+#ifdef _DEBUG
+	else
+	{
+		std::cout << "Error opening file." << std::endl; // Output an error if the file cannot open
+	}
+#endif // DEBUG
+}

@@ -38,6 +38,11 @@ class Screens
 
 	int m_characterNumber;
 
+	// Scoreboard
+	std::string m_names[MAX_PLAYERS]; // Setup the name string array
+	int m_scores[MAX_PLAYERS]; // Setup the scores array
+	int m_characterNums[MAX_PLAYERS]; // Setup the character numbers array
+
 public:
 	Screens();
 	void loadFiles();
@@ -48,5 +53,10 @@ public:
 	void helpScreenEvents(sf::Event t_event, GameState & t_gameState);
 	void characterScreenEvents(sf::Event t_event, GameState & t_gameState, Player &t_player);
 	void draw(sf::RenderWindow & t_window, GameState t_gameState, std::string t_playerName, Player & t_player);
+
+	void saveScoreToFile(std::string t_playerName, int t_playerScore, int t_playerCharNum);
+	void readScore();
+	void addScore(std::string t_playerName, int t_playerScore, int t_playerCharNum);
+	void writeScore();
 };
 

@@ -84,7 +84,7 @@ void Game::processEvents()
 		{
 			if (sf::Keyboard::Comma == nextEvent.key.code)
 			{
-				m_player.saveScoreToFile(m_playerName);
+				m_menuScreens.saveScoreToFile(m_playerName, m_player.getScore(), m_player.getCharNum());
 			}
 		}
 	}

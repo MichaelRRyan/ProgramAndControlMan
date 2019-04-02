@@ -53,15 +53,11 @@ public:
 	inline sf::Sprite getBody() { return m_body; }
 	inline int getScore() { return m_score; } // Returns the score of the player
 	inline int getLives() { return m_lives; } // Returns the lives of the player
+	inline int getCharNum() { return m_characterNumber; } // Returns the character number of the player
 
 	void move(Direction t_direction, Cell t_maze[][MAX_COLS]);
 	void setTextureDirection(Direction t_direction);
 	void update(Cell t_maze[][MAX_COLS], GameState &t_gameState);
 	void checkCollision(WalkerEnemy &t_enemy);
-
-	void saveScoreToFile(std::string t_playerName);
-	void readScore(std::string t_names[], int t_scores[], int t_characterNums[]);
-	void addScore(std::string t_names[], int t_scores[], int t_characterNums[], std::string t_playerName);
-	void writeScore(std::string t_names[], int t_scores[], int t_characterNums[]);
 };
 
