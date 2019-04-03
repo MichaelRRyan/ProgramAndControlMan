@@ -1,3 +1,4 @@
+/// @Author Michael Rainsford Ryan
 #include "WalkerEnemy.h"
 
 

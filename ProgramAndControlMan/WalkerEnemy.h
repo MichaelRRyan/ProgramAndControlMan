@@ -1,4 +1,6 @@
-#pragma once
+/// @Author Michael Rainsford Ryan
+#ifndef WALKER_ENEMY_H
+#define WALKER_ENEMY_H
 
 #include <SFML\Graphics.hpp>
 #include "Globals.h"
@@ -40,3 +42,4 @@ public:
 	void checkForPlayer(Cell t_maze[][MAX_COLS], Player t_player); // Check if the player is within the sight range of the enemy
 };
 
+#endif // !WALKER_ENEMY_H

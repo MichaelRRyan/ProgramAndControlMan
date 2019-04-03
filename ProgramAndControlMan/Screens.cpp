@@ -1,11 +1,12 @@
+/// @Author Michael Rainsford Ryan
 #include "Screens.h"
-
 
 /// <summary>
 /// Default constructer and setup for the game screens.
 /// </summary>
 Screens::Screens() :
-	m_gameOver{ false } // Initialse the game over bool
+	m_gameOver{ false }, // Initialise the game over bool
+	m_characterNumber{ 0 } // Initialise the character number to 0 
 {
 	loadFiles(); // Load the font and texture files
 	setupText(); // Setup the text objects
@@ -19,8 +20,6 @@ Screens::Screens() :
 
 	m_arrowSprite.setTexture(m_buttonTexture);
 	m_arrowSprite.setTextureRect(sf::IntRect{ 339,143,39,31 });
-
-	m_characterNumber = 0;
 }
 
 /// <summary>
@@ -257,6 +256,7 @@ void Screens::characterScreenEvents(sf::Event t_event, GameState & t_gameState, 
 		{
 			t_player.setScale({ 1.0f,1.0f });
 			t_player.refreshPosition();
+			m_gameOver = false;
 			t_gameState = GameState::SetupGame;
 		}
 	}
@@ -336,7 +336,7 @@ void Screens::drawPauseScreen(sf::RenderWindow &t_window)
 }
 
 /// <summary>
-/// Draw the end screen text.
+/// Draw the end screen text and scoreboard.
 /// </summary>
 /// <param name="t_window">Render window</param>
 void Screens::drawEndScreen(sf::RenderWindow & t_window, std::string t_playerName, int t_playerScore, int t_playerCharNum, Player t_player)
@@ -344,14 +344,17 @@ void Screens::drawEndScreen(sf::RenderWindow & t_window, std::string t_playerNam
 	if (!m_gameOver)
 	{
 		saveScoreToFile(t_playerName, t_playerScore, t_playerCharNum);
+		m_characterNumber = t_playerCharNum;
 		m_gameOver = true;
+		t_player.setScale({ 1.0f,1.0f });
+		// Set origin?
 	}
 	
-	t_window.draw(m_endText);
+	t_window.draw(m_endText); // Draw the end screen text
 
 	// Display the player's score
 	t_player.setPosition({ YOUR_SCORE_POSITION.x, YOUR_SCORE_POSITION.y + 16 });
-	t_player.setCharacter(t_playerCharNum);
+	t_player.setCharacter(m_characterNumber);
 	t_window.draw(t_player.getBody());
 
 	m_scoreboardText.setFillColor(sf::Color::Blue);
@@ -380,6 +383,7 @@ void Screens::drawEndScreen(sf::RenderWindow & t_window, std::string t_playerNam
 		t_window.draw(m_scoreboardText);
 	}
 
+	// Setup and display the button
 	m_buttonText.setString("menu");
 	m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
 	m_buttonText.setPosition(BUTTON_BACK_POSITION);

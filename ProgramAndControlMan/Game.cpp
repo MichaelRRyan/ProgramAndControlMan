@@ -1,5 +1,4 @@
 /// @Author Michael Rainsford Ryan
-
 #include "Game.h"
 
 Game::Game() :
@@ -19,7 +18,6 @@ Game::Game() :
 	}
 	m_hudIcons.setTexture(m_hudIconsTexure);
 
-	setupMaze();
 	setupGame();
 	setupFontAndText();
 }
@@ -125,7 +123,6 @@ void Game::update(sf::Time t_deltaTime)
 	}
 	else if (m_gameState == GameState::SetupGame)
 	{
-		setupMaze();
 		setupGame();
 		m_gameState = GameState::Gameplay;
 	}
@@ -165,6 +162,7 @@ void Game::render()
 /// </summary>
 void Game::setupGame()
 {
+	setupMaze();
 	m_player.respawn();
 	m_maze[2][12].setTileType(Tile::None);
 

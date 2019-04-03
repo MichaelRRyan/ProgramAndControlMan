@@ -44,7 +44,6 @@ void Player::respawn()
 	m_hurtTimer = 0;
 	m_moveTimer = 0;
 	m_characterDirection = 0;
-	m_characterNumber = 0;
 	m_lives = 3;
 	setPos({ 12, 2 });
 	m_body.setTextureRect(sf::IntRect{ m_character.x + CHAR_SPACING,m_character.y,CHAR_WIDTH,CHAR_HEIGHT });

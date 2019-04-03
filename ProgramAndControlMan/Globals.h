@@ -1,5 +1,6 @@
 /// @Author Michael Rainsford Ryan
-#pragma once
+#ifndef GLOBALS_H
+#define GLOBALS_H
 
 enum class Direction
 {
@@ -70,3 +71,5 @@ public:
 		}
 	}
 };
+
+#endif // !GLOBALS_H

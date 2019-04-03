@@ -1,5 +1,6 @@
 /// @Author Michael Rainsford Ryan
-#pragma once
+#ifndef CELL_H
+#define CELL_H
 
 #include <SFML\Graphics.hpp>
 #include "Globals.h"
@@ -22,3 +23,4 @@ public:
 	inline void setPosition(sf::Vector2f t_position) { m_position = t_position; } // Sets the position of the cell
 };
 
+#endif // !CELL_H

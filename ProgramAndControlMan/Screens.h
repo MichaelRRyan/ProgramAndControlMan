@@ -1,6 +1,6 @@
-// @Author Michael Rainsford Ryan
-
-#pragma once
+/// @Author Michael Rainsford Ryan
+#ifndef SCREENS_H
+#define SCREEENS_H
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -70,3 +70,4 @@ public:
 	void writeScore();
 };
 
+#endif // !SCREENS_H

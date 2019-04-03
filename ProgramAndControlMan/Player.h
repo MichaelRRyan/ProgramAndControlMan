@@ -1,5 +1,6 @@
 /// @Author Michael Rainsford Ryan
-#pragma once
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #include <SFML\Graphics.hpp>
 #include <string>
@@ -61,3 +62,4 @@ public:
 	void checkCollision(WalkerEnemy &t_enemy);
 };
 
+#endif // !PLAYER_H
