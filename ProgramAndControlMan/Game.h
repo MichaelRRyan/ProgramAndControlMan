@@ -39,14 +39,17 @@ private:
 	Player m_player;
 	Screens m_menuScreens;
 	
-	sf::Font m_arialFont;
+	sf::Font m_twosonFont;
 
 	sf::Text m_scoreText;
 	sf::Text m_livesText;
 	sf::Text m_gameOverText;
 
 	sf::Texture m_terrainTexture;
+	sf::Texture m_hudIconsTexure;
+
 	sf::Sprite m_tileSprite;
+	sf::Sprite m_hudIcons;
 
 	std::string m_playerName;
 };

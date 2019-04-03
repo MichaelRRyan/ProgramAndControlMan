@@ -2,6 +2,9 @@
 /// @Author Michael Rainsford Ryan
 /// @Date 04/01/2019
 /// Time: 13:00 - 13:17 - Setup the basic game files
+/// ---------------------------------
+/// Issues:
+/// - Character sprite moves to the left when game is over and reset once
 
 /////////////////////////////////////////////////////////////////////////////////////////
 /// Basic starter files written by Michael Rainsford Ryan with the intent for them to ///

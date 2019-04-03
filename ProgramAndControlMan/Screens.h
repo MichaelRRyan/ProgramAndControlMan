@@ -16,9 +16,9 @@ const int BUTTON_HEIGHT{ 88 };
 const sf::Vector2f BUTTON_ONE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 400.0f };
 const sf::Vector2f BUTTON_TWO_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 520.0f };
 const sf::Vector2f BUTTON_THREE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 640.0f };
-const sf::Vector2f BUTTON_HELP_POSITION{ static_cast<float>(BUTTON_IMAGE_WIDTH), static_cast<float>(WINDOW_HEIGHT - 60) };
-const sf::Vector2f SCOREBOARD_POSITION{ static_cast<float>(WINDOW_WIDTH / 2 - 170), 250.0f };
-const sf::Vector2f YOUR_SCORE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2 - 170), 150.0f };
+const sf::Vector2f BUTTON_BACK_POSITION{ static_cast<float>(BUTTON_IMAGE_WIDTH), static_cast<float>(WINDOW_HEIGHT - 60) };
+const sf::Vector2f SCOREBOARD_POSITION{ static_cast<float>(WINDOW_WIDTH / 2 - 160), 170.0f };
+const sf::Vector2f YOUR_SCORE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2 - 160), 100.0f };
 
 class Screens
 {
@@ -30,7 +30,7 @@ class Screens
 	sf::Sprite m_buttonSprite;
 	sf::Sprite m_arrowSprite;
 
-	sf::Font m_foursideFont;
+	sf::Font m_twosonFont;
 
 	sf::Text m_titleText;
 	sf::Text m_buttonText;
@@ -55,10 +55,11 @@ public:
 	void loadFiles();
 	void setupText();
 	void processEvents(sf::Event t_event, GameState & t_gameState, std::string & t_playerName, bool &t_gameOver, Player &t_player);
-	void menuEvents(sf::Event t_event, GameState & t_gameState, bool &t_gameOver);
+	void menuEvents(sf::Event t_event, GameState & t_gameState, bool &t_gameOver, std::string & t_playerName);
 	void nameScreenEvents(sf::Event t_event, GameState & t_gameState, std::string & t_playerName);
-	void helpScreenEvents(sf::Event t_event, GameState & t_gameState);
+	void backButtonEvents(sf::Event t_event, GameState & t_gameState);
 	void characterScreenEvents(sf::Event t_event, GameState & t_gameState, Player &t_player);
+
 	void draw(sf::RenderWindow & t_window, GameState t_gameState, std::string t_playerName, Player & t_player);
 	void drawPauseScreen(sf::RenderWindow &t_window);
 	void drawEndScreen(sf::RenderWindow &t_window, std::string t_playerName, int t_playerScore, int t_playerCharNum, Player t_player);

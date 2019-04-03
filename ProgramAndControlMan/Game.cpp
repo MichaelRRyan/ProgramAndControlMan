@@ -13,6 +13,12 @@ Game::Game() :
 	}
 	m_tileSprite.setTexture(m_terrainTexture);
 
+	if (!m_hudIconsTexure.loadFromFile("ASSETS\\IMAGES\\hud_icons.png"))
+	{
+		// Error loading file
+	}
+	m_hudIcons.setTexture(m_hudIconsTexure);
+
 	setupMaze();
 	setupGame();
 	setupFontAndText();
@@ -83,30 +89,9 @@ void Game::processEvents()
 				}
 			}
 			break;
-		case GameState::GameOver:
-			if (sf::Event::KeyPressed == nextEvent.type)
-			{
-				if (sf::Keyboard::R == nextEvent.key.code)
-				{
-					setupMaze();
-					setupGame();
-					m_playerName = "";
-					m_gameState = GameState::MenuScreen;
-				}
-			}
-			break;
 		default:
 			m_menuScreens.processEvents(nextEvent, m_gameState, m_playerName, m_exitGame, m_player);
 			break;
-		}
-
-		//////////// DEBUG /////////////
-		if (sf::Event::KeyPressed == nextEvent.type)
-		{
-			if (sf::Keyboard::Comma == nextEvent.key.code)
-			{
-				m_menuScreens.saveScoreToFile(m_playerName, m_player.getScore(), m_player.getCharNum());
-			}
 		}
 	}
 }
@@ -133,10 +118,16 @@ void Game::update(sf::Time t_deltaTime)
 			m_ghosts[i].move(m_maze, m_ghosts, m_player); // Move the ghosts
 		}
 
-		m_scoreText.setString(m_playerName + "'s Score: " + std::to_string(m_player.getScore())); // Update the score text
-		m_livesText.setString("Health: " + std::to_string(m_player.getLives())); // Update the health text
+		m_scoreText.setString(std::to_string(m_player.getScore())); // Update the score text
+		m_livesText.setString(std::to_string(m_player.getLives())); // Update the health text
 
 		m_player.update(m_maze, m_gameState); // Update the player
+	}
+	else if (m_gameState == GameState::SetupGame)
+	{
+		setupMaze();
+		setupGame();
+		m_gameState = GameState::Gameplay;
 	}
 }
 
@@ -240,17 +231,15 @@ void Game::setupMaze()
 /// </summary>
 void Game::setupFontAndText()
 {
-	if (!m_arialFont.loadFromFile("ASSETS\\FONTS\\arial.ttf"))
+	if (!m_twosonFont.loadFromFile("ASSETS\\FONTS\\twoson.ttf"))
 	{
 		// Error loading font file
 	}
-	m_scoreText.setFont(m_arialFont);
-	m_scoreText.setPosition(0.0f, static_cast<float>(WINDOW_HEIGHT - 45));
-	m_livesText.setFont(m_arialFont);
-	m_livesText.setPosition(static_cast<float>(WINDOW_WIDTH / 2 + 50), static_cast<float>(WINDOW_HEIGHT - 45));
+	m_scoreText.setFont(m_twosonFont);
+	m_livesText.setFont(m_twosonFont);
 
 	// Setup the game over text
-	m_gameOverText.setFont(m_arialFont);
+	m_gameOverText.setFont(m_twosonFont);
 	m_gameOverText.setString("GAME OVER");
 	m_gameOverText.setCharacterSize(50u);
 	m_gameOverText.setOrigin(m_gameOverText.getGlobalBounds().width / 2, m_gameOverText.getGlobalBounds().height / 2);
@@ -295,6 +284,20 @@ void Game::drawGameplay()
 			m_window.draw(m_player.getBody());
 		}
 	}
+
+	m_hudIcons.setTextureRect({ 64, 0, 288, 32 });
+	m_hudIcons.setPosition(256.0f, 0.0f);
+	m_window.draw(m_hudIcons);
+
+	m_hudIcons.setTextureRect({ 0, 0, 32, 32 });
+	m_hudIcons.setPosition(static_cast<float>(WINDOW_WIDTH / 2 - 100), 0.0f);
+	m_window.draw(m_hudIcons);
+	m_livesText.setPosition(static_cast<float>(WINDOW_WIDTH / 2 - 60), 0.0f);
+
+	m_hudIcons.setTextureRect({ 32, 0, 32, 32 });
+	m_hudIcons.setPosition(static_cast<float>(WINDOW_WIDTH / 2 + 20), 0.0f);
+	m_window.draw(m_hudIcons);
+	m_scoreText.setPosition(static_cast<float>(WINDOW_WIDTH / 2 + 70), 0.0f);
 
 	m_window.draw(m_scoreText);
 	m_window.draw(m_livesText);

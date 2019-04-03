@@ -37,7 +37,7 @@ void Screens::loadFiles()
 	{
 		// Error loading background sprite
 	}
-	if (!m_foursideFont.loadFromFile("ASSETS\\FONTS\\twoson.ttf"))
+	if (!m_twosonFont.loadFromFile("ASSETS\\FONTS\\twoson.ttf"))
 	{
 		// Error loading font file
 	}
@@ -49,26 +49,26 @@ void Screens::loadFiles()
 /// </summary>
 void Screens::setupText()
 {
-	m_titleText.setFont(m_foursideFont);
+	m_titleText.setFont(m_twosonFont);
 	m_titleText.setCharacterSize(80u);
 	m_titleText.setString("PACMAN");
 	m_titleText.setPosition(400.0f, 80.0f);
 	m_titleText.setOrigin(m_titleText.getGlobalBounds().width / 2, 0);
 
-	m_buttonText.setFont(m_foursideFont);
+	m_buttonText.setFont(m_twosonFont);
 	m_buttonText.setFillColor(sf::Color::Black);
 	m_buttonText.setCharacterSize(40u);
 
-	m_nameText.setFont(m_foursideFont);
+	m_nameText.setFont(m_twosonFont);
 	m_nameText.setPosition(400.0f, 450.0f);
 	m_nameText.setCharacterSize(30u);
 
-	m_enterNameText.setFont(m_foursideFont);
+	m_enterNameText.setFont(m_twosonFont);
 	m_enterNameText.setPosition(400.0f, 350.0f);
 	m_enterNameText.setString("ENTER YOUR NAME:");
 	m_enterNameText.setOrigin(m_titleText.getGlobalBounds().width / 2, 0);
 
-	m_helpText.setFont(m_foursideFont);
+	m_helpText.setFont(m_twosonFont);
 	m_helpText.setPosition(50.0f, 350.0f);
 	m_helpText.setCharacterSize(20u);
 	m_helpText.setLineSpacing(1.2f);
@@ -79,18 +79,18 @@ void Screens::setupText()
 	helpTextString.append("\nghosts:\nTHE RED GHOSTS ARE EVIL DONT TOUCH\nTHEM OR YOU WILL LOSE A LIFE.\nLOSE ALL YOUR LIVES AND YOU LOSE.");
 	m_helpText.setString(helpTextString);
 
-	m_pauseText.setFont(m_foursideFont);
+	m_pauseText.setFont(m_twosonFont);
 	m_pauseText.setPosition(310.0f, 350.0f);
 	m_pauseText.setString("PAUSE");
 	m_pauseText.setCharacterSize(40u);
 
-	m_endText.setFont(m_foursideFont);
-	m_endText.setPosition(240.0f, 80.0f);
+	m_endText.setFont(m_twosonFont);
+	m_endText.setPosition(240.0f, 10.0f);
 	m_endText.setString("GAME OVER");
-	m_endText.setCharacterSize(40u);
+	m_endText.setCharacterSize(50u);
 
-	m_scoreboardText.setFont(m_foursideFont);
-	m_yourScoreText.setFont(m_foursideFont);
+	m_scoreboardText.setFont(m_twosonFont);
+	m_yourScoreText.setFont(m_twosonFont);
 }
 
 /// <summary>
@@ -105,16 +105,19 @@ void Screens::processEvents(sf::Event t_event, GameState & t_gameState, std::str
 	switch (t_gameState)
 	{
 	case GameState::MenuScreen:
-		menuEvents(t_event, t_gameState, t_gameOver);
+		menuEvents(t_event, t_gameState, t_gameOver, t_playerName);
 		break;
 	case GameState::NameScreen:
 		nameScreenEvents(t_event, t_gameState, t_playerName);
 		break;
 	case GameState::HelpScreen:
-		helpScreenEvents(t_event, t_gameState);
+		backButtonEvents(t_event, t_gameState);
 		break;
 	case GameState::CharacterScreen:
 		characterScreenEvents(t_event, t_gameState, t_player);
+		break;
+	case GameState::GameOver:
+		backButtonEvents(t_event, t_gameState);
 		break;
 	}
 }
@@ -125,7 +128,7 @@ void Screens::processEvents(sf::Event t_event, GameState & t_gameState, std::str
 /// <param name="t_event">User event</param>
 /// <param name="t_gameState">Game state</param>
 /// <param name="t_gameOver">Game over bool</param>
-void Screens::menuEvents(sf::Event t_event, GameState & t_gameState, bool & t_gameOver)
+void Screens::menuEvents(sf::Event t_event, GameState & t_gameState, bool & t_gameOver, std::string & t_playerName)
 {
 	if (sf::Event::MouseButtonPressed == t_event.type)
 	{
@@ -139,6 +142,8 @@ void Screens::menuEvents(sf::Event t_event, GameState & t_gameState, bool & t_ga
 				if (t_event.mouseButton.y > BUTTON_ONE_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_ONE_POSITION.y + BUTTON_HEIGHT / 2)
 				{
 					t_gameState = GameState::NameScreen;
+					m_characterNumber = 0;
+					t_playerName = "";
 				}
 				// Check that the click is within the vertical bounds of the second the button (Help)
 				if (t_event.mouseButton.y > BUTTON_TWO_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_TWO_POSITION.y + BUTTON_HEIGHT / 2)
@@ -198,7 +203,7 @@ void Screens::nameScreenEvents(sf::Event t_event, GameState & t_gameState, std::
 /// </summary>
 /// <param name="t_event">User event</param>
 /// <param name="t_gameState">Game state</param>
-void Screens::helpScreenEvents(sf::Event t_event, GameState & t_gameState)
+void Screens::backButtonEvents(sf::Event t_event, GameState & t_gameState)
 {
 	if (sf::Event::KeyPressed == t_event.type)
 	{
@@ -213,15 +218,14 @@ void Screens::helpScreenEvents(sf::Event t_event, GameState & t_gameState)
 		if (sf::Mouse::Left == t_event.mouseButton.button)
 		{
 			// Check that the click was within the horisontal bounds of the buttons
-			if (t_event.mouseButton.x > BUTTON_HELP_POSITION.x - BUTTON_WIDTH / 2 && t_event.mouseButton.x < BUTTON_HELP_POSITION.x + BUTTON_WIDTH / 2)
+			if (t_event.mouseButton.x > BUTTON_BACK_POSITION.x - BUTTON_WIDTH / 2 && t_event.mouseButton.x < BUTTON_BACK_POSITION.x + BUTTON_WIDTH / 2)
 			{
 				// Check that the click is within the vertical bounds of the first the button (Start)
-				if (t_event.mouseButton.y > BUTTON_HELP_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_HELP_POSITION.y + BUTTON_HEIGHT / 2)
+				if (t_event.mouseButton.y > BUTTON_BACK_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_BACK_POSITION.y + BUTTON_HEIGHT / 2)
 				{
 					t_gameState = GameState::MenuScreen;
 				}
 			}
-
 		}
 	}
 }
@@ -253,7 +257,7 @@ void Screens::characterScreenEvents(sf::Event t_event, GameState & t_gameState, 
 		{
 			t_player.setScale({ 1.0f,1.0f });
 			t_player.refreshPosition();
-			t_gameState = GameState::Gameplay;
+			t_gameState = GameState::SetupGame;
 		}
 	}
 }
@@ -273,21 +277,21 @@ void Screens::draw(sf::RenderWindow & t_window, GameState t_gameState, std::stri
 	{
 	case GameState::MenuScreen:
 		m_buttonText.setString("start");
-		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height / 1.5));
+		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
 		m_buttonText.setPosition(BUTTON_ONE_POSITION);
 		m_buttonSprite.setPosition(BUTTON_ONE_POSITION);
 		t_window.draw(m_buttonSprite);
 		t_window.draw(m_buttonText);
 
 		m_buttonText.setString("help");
-		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height / 1.5));
+		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
 		m_buttonText.setPosition(BUTTON_TWO_POSITION);
 		m_buttonSprite.setPosition(BUTTON_TWO_POSITION);
 		t_window.draw(m_buttonSprite);
 		t_window.draw(m_buttonText);
 
 		m_buttonText.setString("exit");
-		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height / 1.5));
+		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
 		m_buttonText.setPosition(BUTTON_THREE_POSITION);
 		m_buttonSprite.setPosition(BUTTON_THREE_POSITION);
 		t_window.draw(m_buttonSprite);
@@ -301,9 +305,9 @@ void Screens::draw(sf::RenderWindow & t_window, GameState t_gameState, std::stri
 		break;
 	case GameState::HelpScreen:
 		m_buttonText.setString("back");
-		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height / 1.5));
-		m_buttonText.setPosition(BUTTON_HELP_POSITION);
-		m_buttonSprite.setPosition(BUTTON_HELP_POSITION);
+		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
+		m_buttonText.setPosition(BUTTON_BACK_POSITION);
+		m_buttonSprite.setPosition(BUTTON_BACK_POSITION);
 		t_window.draw(m_buttonSprite);
 		t_window.draw(m_buttonText);
 		t_window.draw(m_helpText);
@@ -342,7 +346,6 @@ void Screens::drawEndScreen(sf::RenderWindow & t_window, std::string t_playerNam
 		saveScoreToFile(t_playerName, t_playerScore, t_playerCharNum);
 		m_gameOver = true;
 	}
-
 	
 	t_window.draw(m_endText);
 
@@ -377,6 +380,12 @@ void Screens::drawEndScreen(sf::RenderWindow & t_window, std::string t_playerNam
 		t_window.draw(m_scoreboardText);
 	}
 
+	m_buttonText.setString("menu");
+	m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
+	m_buttonText.setPosition(BUTTON_BACK_POSITION);
+	m_buttonSprite.setPosition(BUTTON_BACK_POSITION);
+	t_window.draw(m_buttonSprite);
+	t_window.draw(m_buttonText);
 }
 
 /// <summary>

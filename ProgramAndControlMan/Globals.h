@@ -18,7 +18,8 @@ enum class GameState
 	CharacterScreen,
 	Gameplay,
 	Pause,
-	GameOver
+	GameOver,
+	SetupGame
 };
 
 enum class Tile
@@ -34,7 +35,7 @@ const int MAX_COLS{ 25 };
 
 const unsigned MAX_GHOSTS{ 4 };
 const unsigned WINDOW_WIDTH{ 800u };
-const unsigned WINDOW_HEIGHT{ 850u };
+const unsigned WINDOW_HEIGHT{ 800u };
 
 // Texture Information
 const int TILE_SIZE{ 32 };
