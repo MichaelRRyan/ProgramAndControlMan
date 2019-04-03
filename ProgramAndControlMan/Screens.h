@@ -17,6 +17,8 @@ const sf::Vector2f BUTTON_ONE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 40
 const sf::Vector2f BUTTON_TWO_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 520.0f };
 const sf::Vector2f BUTTON_THREE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 640.0f };
 const sf::Vector2f BUTTON_HELP_POSITION{ static_cast<float>(BUTTON_IMAGE_WIDTH), static_cast<float>(WINDOW_HEIGHT - 60) };
+const sf::Vector2f SCOREBOARD_POSITION{ static_cast<float>(WINDOW_WIDTH / 2 - 170), 250.0f };
+const sf::Vector2f YOUR_SCORE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2 - 170), 150.0f };
 
 class Screens
 {
@@ -28,15 +30,20 @@ class Screens
 	sf::Sprite m_buttonSprite;
 	sf::Sprite m_arrowSprite;
 
-	sf::Font m_pacFont;
+	sf::Font m_foursideFont;
 
 	sf::Text m_titleText;
 	sf::Text m_buttonText;
 	sf::Text m_helpText;
 	sf::Text m_enterNameText;
 	sf::Text m_nameText;
+	sf::Text m_pauseText;
+	sf::Text m_endText;
+	sf::Text m_scoreboardText;
+	sf::Text m_yourScoreText;
 
-	int m_characterNumber;
+	int m_characterNumber; // Player character number used for character selection
+	bool m_gameOver; // Used to load the scoreboard file only once each time the player dies
 
 	// Scoreboard
 	std::string m_names[MAX_PLAYERS]; // Setup the name string array
@@ -53,6 +60,8 @@ public:
 	void helpScreenEvents(sf::Event t_event, GameState & t_gameState);
 	void characterScreenEvents(sf::Event t_event, GameState & t_gameState, Player &t_player);
 	void draw(sf::RenderWindow & t_window, GameState t_gameState, std::string t_playerName, Player & t_player);
+	void drawPauseScreen(sf::RenderWindow &t_window);
+	void drawEndScreen(sf::RenderWindow &t_window, std::string t_playerName, int t_playerScore, int t_playerCharNum, Player t_player);
 
 	void saveScoreToFile(std::string t_playerName, int t_playerScore, int t_playerCharNum);
 	void readScore();

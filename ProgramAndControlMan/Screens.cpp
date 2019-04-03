@@ -4,11 +4,13 @@
 /// <summary>
 /// Default constructer and setup for the game screens.
 /// </summary>
-Screens::Screens()
+Screens::Screens() :
+	m_gameOver{ false } // Initialse the game over bool
 {
-	loadFiles();
+	loadFiles(); // Load the font and texture files
+	setupText(); // Setup the text objects
 
-	m_backgroundSprite.setTexture(m_backgroundTexture);
+	m_backgroundSprite.setTexture(m_backgroundTexture); // Set the background texture to the sprite
 
 	m_buttonSprite.setTexture(m_buttonTexture);
 	m_buttonSprite.setTextureRect(sf::IntRect{ BUTTON_IMAGE_WIDTH,45,BUTTON_IMAGE_WIDTH,BUTTON_IMAGE_HEIGHT });
@@ -17,8 +19,6 @@ Screens::Screens()
 
 	m_arrowSprite.setTexture(m_buttonTexture);
 	m_arrowSprite.setTextureRect(sf::IntRect{ 339,143,39,31 });
-
-	setupText();
 
 	m_characterNumber = 0;
 }
@@ -37,38 +37,38 @@ void Screens::loadFiles()
 	{
 		// Error loading background sprite
 	}
-	if (!m_pacFont.loadFromFile("ASSETS\\FONTS\\pac_font.ttf"))
+	if (!m_foursideFont.loadFromFile("ASSETS\\FONTS\\twoson.ttf"))
 	{
 		// Error loading font file
 	}
 }
 
+/// <summary>
+/// Setup all the text objects with the pacman font,
+/// correct size, position, colour and string.
+/// </summary>
 void Screens::setupText()
 {
-	m_titleText.setFont(m_pacFont);
+	m_titleText.setFont(m_foursideFont);
 	m_titleText.setCharacterSize(80u);
 	m_titleText.setString("PACMAN");
 	m_titleText.setPosition(400.0f, 80.0f);
 	m_titleText.setOrigin(m_titleText.getGlobalBounds().width / 2, 0);
 
-	m_buttonText.setFont(m_pacFont);
+	m_buttonText.setFont(m_foursideFont);
 	m_buttonText.setFillColor(sf::Color::Black);
 	m_buttonText.setCharacterSize(40u);
 
-	m_nameText.setFont(m_pacFont);
-	m_nameText.setFillColor(sf::Color::White);
+	m_nameText.setFont(m_foursideFont);
 	m_nameText.setPosition(400.0f, 450.0f);
 	m_nameText.setCharacterSize(30u);
 
-	m_enterNameText.setFont(m_pacFont);
-	m_enterNameText.setFillColor(sf::Color::White);
+	m_enterNameText.setFont(m_foursideFont);
 	m_enterNameText.setPosition(400.0f, 350.0f);
-	m_enterNameText.setCharacterSize(30u);
 	m_enterNameText.setString("ENTER YOUR NAME:");
 	m_enterNameText.setOrigin(m_titleText.getGlobalBounds().width / 2, 0);
 
-	m_helpText.setFont(m_pacFont);
-	m_helpText.setFillColor(sf::Color::White);
+	m_helpText.setFont(m_foursideFont);
 	m_helpText.setPosition(50.0f, 350.0f);
 	m_helpText.setCharacterSize(20u);
 	m_helpText.setLineSpacing(1.2f);
@@ -78,6 +78,19 @@ void Screens::setupText()
 	helpTextString.append("\ngoal:\nPICKUP ALL THE PELLETS IN THE LEVEL\nAND YOU WIN.\nTRY TO SURVIVE AS MANY LEVELS AS POSSIBLE\nAND GET THE HIGHEST SCORE.");
 	helpTextString.append("\nghosts:\nTHE RED GHOSTS ARE EVIL DONT TOUCH\nTHEM OR YOU WILL LOSE A LIFE.\nLOSE ALL YOUR LIVES AND YOU LOSE.");
 	m_helpText.setString(helpTextString);
+
+	m_pauseText.setFont(m_foursideFont);
+	m_pauseText.setPosition(310.0f, 350.0f);
+	m_pauseText.setString("PAUSE");
+	m_pauseText.setCharacterSize(40u);
+
+	m_endText.setFont(m_foursideFont);
+	m_endText.setPosition(240.0f, 80.0f);
+	m_endText.setString("GAME OVER");
+	m_endText.setCharacterSize(40u);
+
+	m_scoreboardText.setFont(m_foursideFont);
+	m_yourScoreText.setFont(m_foursideFont);
 }
 
 /// <summary>
@@ -306,9 +319,64 @@ void Screens::draw(sf::RenderWindow & t_window, GameState t_gameState, std::stri
 		break;
 	}
 
-	
-
 	t_window.draw(m_titleText);
+}
+
+/// <summary>
+/// Draw the pause text.
+/// </summary>
+/// <param name="t_window">Render window</param>
+void Screens::drawPauseScreen(sf::RenderWindow &t_window)
+{
+	t_window.draw(m_pauseText);
+}
+
+/// <summary>
+/// Draw the end screen text.
+/// </summary>
+/// <param name="t_window">Render window</param>
+void Screens::drawEndScreen(sf::RenderWindow & t_window, std::string t_playerName, int t_playerScore, int t_playerCharNum, Player t_player)
+{
+	if (!m_gameOver)
+	{
+		saveScoreToFile(t_playerName, t_playerScore, t_playerCharNum);
+		m_gameOver = true;
+	}
+
+	
+	t_window.draw(m_endText);
+
+	// Display the player's score
+	t_player.setPosition({ YOUR_SCORE_POSITION.x, YOUR_SCORE_POSITION.y + 16 });
+	t_player.setCharacter(t_playerCharNum);
+	t_window.draw(t_player.getBody());
+
+	m_scoreboardText.setFillColor(sf::Color::Blue);
+	m_scoreboardText.setPosition(YOUR_SCORE_POSITION.x + 100, YOUR_SCORE_POSITION.y);
+	m_scoreboardText.setString(t_playerName);
+	t_window.draw(m_scoreboardText);
+	m_scoreboardText.setPosition(YOUR_SCORE_POSITION.x + 250, YOUR_SCORE_POSITION.y);
+	m_scoreboardText.setString(std::to_string(t_playerScore));
+	t_window.draw(m_scoreboardText);
+	m_scoreboardText.setFillColor(sf::Color::White);
+
+	for (int i = 0; i < MAX_PLAYERS; i++) // Loop through all players in the scoreboard and display them
+	{
+		t_player.setPosition({ SCOREBOARD_POSITION.x, SCOREBOARD_POSITION.y + (i * 50) + 16 });
+		t_player.setCharacter(m_characterNums[i]);
+		t_window.draw(t_player.getBody());
+
+		m_scoreboardText.setPosition(SCOREBOARD_POSITION.x + 50, SCOREBOARD_POSITION.y + (i * 50));
+		m_scoreboardText.setString(std::to_string(i + 1));
+		t_window.draw(m_scoreboardText);
+		m_scoreboardText.setPosition(SCOREBOARD_POSITION.x + 100.0f, SCOREBOARD_POSITION.y + (i * 50));
+		m_scoreboardText.setString(m_names[i]);
+		t_window.draw(m_scoreboardText);
+		m_scoreboardText.setPosition(SCOREBOARD_POSITION.x + 250.0f, SCOREBOARD_POSITION.y + (i * 50));
+		m_scoreboardText.setString(std::to_string(m_scores[i]));
+		t_window.draw(m_scoreboardText);
+	}
+
 }
 
 /// <summary>

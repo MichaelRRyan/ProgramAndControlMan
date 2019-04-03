@@ -62,8 +62,28 @@ void Game::processEvents()
 		{
 			m_window.close();
 		}
-		if (m_gameState == GameState::GameOver)
+
+		switch (m_gameState) // Process events for each game state
 		{
+		case GameState::Gameplay:
+			if (sf::Event::KeyPressed == nextEvent.type)
+			{
+				if (sf::Keyboard::P == nextEvent.key.code)
+				{
+					m_gameState = GameState::Pause;
+				}
+			}
+			break;
+		case GameState::Pause:
+			if (sf::Event::KeyPressed == nextEvent.type)
+			{
+				if (sf::Keyboard::Escape == nextEvent.key.code)
+				{
+					m_gameState = GameState::Gameplay;
+				}
+			}
+			break;
+		case GameState::GameOver:
 			if (sf::Event::KeyPressed == nextEvent.type)
 			{
 				if (sf::Keyboard::R == nextEvent.key.code)
@@ -74,12 +94,13 @@ void Game::processEvents()
 					m_gameState = GameState::MenuScreen;
 				}
 			}
-		}
-		if (m_gameState == GameState::MenuScreen || m_gameState == GameState::HelpScreen
-			|| m_gameState == GameState::NameScreen || m_gameState == GameState::CharacterScreen)
-		{
+			break;
+		default:
 			m_menuScreens.processEvents(nextEvent, m_gameState, m_playerName, m_exitGame, m_player);
+			break;
 		}
+
+		//////////// DEBUG /////////////
 		if (sf::Event::KeyPressed == nextEvent.type)
 		{
 			if (sf::Keyboard::Comma == nextEvent.key.code)
@@ -106,16 +127,16 @@ void Game::update(sf::Time t_deltaTime)
 
 	if (m_gameState == GameState::Gameplay)
 	{
-		for (int i = 0; i < MAX_GHOSTS; i++)
+		for (int i = 0; i < MAX_GHOSTS; i++) // Loop through all ghosts
 		{
-			m_player.checkCollision(m_ghosts[i]);
-			m_ghosts[i].move(m_maze, m_ghosts, m_player);
+			m_player.checkCollision(m_ghosts[i]); // Check collisions with the player and ghosts
+			m_ghosts[i].move(m_maze, m_ghosts, m_player); // Move the ghosts
 		}
 
-		m_scoreText.setString(m_playerName + "'s Score: " + std::to_string(m_player.getScore()));
-		m_livesText.setString("Health: " + std::to_string(m_player.getLives()));
+		m_scoreText.setString(m_playerName + "'s Score: " + std::to_string(m_player.getScore())); // Update the score text
+		m_livesText.setString("Health: " + std::to_string(m_player.getLives())); // Update the health text
 
-		m_player.update(m_maze, m_gameState);
+		m_player.update(m_maze, m_gameState); // Update the player
 	}
 }
 
@@ -130,33 +151,14 @@ void Game::render()
 	switch (m_gameState)
 	{
 	case GameState::Gameplay:
-		drawMaze();
-
-		// Loop through all rows to draw players and enemies in order of screen height
-		for (int row = 0; row < MAX_ROWS; row++)
-		{
-			for (int i = 0; i < MAX_GHOSTS; i++) // Loop through all the ghosts
-			{
-				if (m_ghosts[i].getPos().y == row) // Check if the ghost is on this row
-				{
-					m_window.draw(m_ghosts[i].getBody());
-				}
-			}
-
-			if (m_player.getPos().y == row) // Check if the player is on this row
-			{
-				m_window.draw(m_player.getBody());
-			}
-		}
-
-		m_window.draw(m_scoreText);
-		m_window.draw(m_livesText);
+		drawGameplay();
 		break;
 	case GameState::Pause:
+		drawGameplay();
+		m_menuScreens.drawPauseScreen(m_window);
 		break;
 	case GameState::GameOver:
-		m_window.draw(m_gameOverText);
-		m_window.draw(m_scoreText);
+		m_menuScreens.drawEndScreen(m_window, m_playerName, m_player.getScore(), m_player.getCharNum(), m_player);
 		break;
 	default:
 		m_menuScreens.draw(m_window, m_gameState, m_playerName, m_player);
@@ -258,7 +260,7 @@ void Game::setupFontAndText()
 /// <summary>
 /// <para>Draws each cell of the maze and the background.</para>
 /// </summary>
-void Game::drawMaze()
+void Game::drawGameplay()
 {
 	for (int row = 0; row < MAX_ROWS; row++)
 	{
@@ -276,4 +278,24 @@ void Game::drawMaze()
 			}
 		}
 	}
+
+	// Loop through all rows to draw players and enemies in order of screen height
+	for (int row = 0; row < MAX_ROWS; row++)
+	{
+		for (int i = 0; i < MAX_GHOSTS; i++) // Loop through all the ghosts
+		{
+			if (m_ghosts[i].getPos().y == row) // Check if the ghost is on this row
+			{
+				m_window.draw(m_ghosts[i].getBody());
+			}
+		}
+
+		if (m_player.getPos().y == row) // Check if the player is on this row
+		{
+			m_window.draw(m_player.getBody());
+		}
+	}
+
+	m_window.draw(m_scoreText);
+	m_window.draw(m_livesText);
 }

@@ -200,6 +200,7 @@ void Player::update(Cell t_maze[][MAX_COLS], GameState & t_gameState)
 	if (m_lives <= 0) // If the player dies
 	{
 		t_gameState = GameState::GameOver;
+		m_body.setColor(sf::Color::White);
 	    m_lives = 0; // Set lives to 0 to avoid displaying -1
 	}
 }

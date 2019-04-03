@@ -27,7 +27,7 @@ private:
 	void setupGame();
 	void setupMaze();
 	void setupFontAndText();
-	void drawMaze();
+	void drawGameplay();
 
 	sf::RenderWindow m_window;
 	bool m_exitGame;
