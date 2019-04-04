@@ -10,7 +10,7 @@
 /// -----------------------------------
 /// Issues/To-Do:
 /// - Scoreboard button needed on main menu
-/// - Menu needs to be redone
+/// - Add win condition
 
 #ifdef _DEBUG 
 #pragma comment(lib,"sfml-graphics-d.lib") 

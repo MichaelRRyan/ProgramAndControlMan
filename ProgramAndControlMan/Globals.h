@@ -20,7 +20,8 @@ enum class GameState
 	Gameplay,
 	Pause,
 	GameOver,
-	SetupGame
+	SetupGame,
+	ScoreboardScreen
 };
 
 enum class Tile

@@ -98,7 +98,8 @@ void Player::move(Direction t_direction, Cell t_maze[][MAX_COLS])
 			m_pos = desiredPosition; // Set the current position to the desired one
 			m_moveTimer = MOVEMENT_TIME; // Set the movement timer to add movement delay
 		}
-		else if (t_maze[desiredPosition.y + dirVector.y][desiredPosition.x + dirVector.x].getTileType() != Tile::Rock)
+		else if (t_maze[desiredPosition.y + dirVector.y][desiredPosition.x + dirVector.x].getTileType() != Tile::Rock
+				&& t_maze[desiredPosition.y + dirVector.y][desiredPosition.x + dirVector.x].getTileType() != Tile::Moveable)
 		{
 			// Switch the tiles
 			t_maze[desiredPosition.y][desiredPosition.x].setTileType(t_maze[desiredPosition.y + dirVector.y][desiredPosition.x + dirVector.x].getTileType());

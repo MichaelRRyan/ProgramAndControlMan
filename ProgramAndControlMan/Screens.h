@@ -15,9 +15,10 @@ const int BUTTON_HEIGHT{ 88 };
 
 const int HELP_SCREENS{ 3 };
 
-const sf::Vector2f BUTTON_ONE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 400.0f };
-const sf::Vector2f BUTTON_TWO_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 520.0f };
-const sf::Vector2f BUTTON_THREE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 640.0f };
+const sf::Vector2f BUTTON_START_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 400.0f };
+const sf::Vector2f BUTTON_HELP_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 510.0f };
+const sf::Vector2f BUTTON_SCOREBOARD_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 620.0f };
+const sf::Vector2f BUTTON_EXIT_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 730.0f };
 const sf::Vector2f BUTTON_MENU_POSITION{ static_cast<float>(BUTTON_IMAGE_WIDTH), static_cast<float>(WINDOW_HEIGHT - 60) };
 const sf::Vector2f BUTTON_NEXT_POSITION{ static_cast<float>(WINDOW_WIDTH - BUTTON_IMAGE_WIDTH), static_cast<float>(WINDOW_HEIGHT - 60) };
 const sf::Vector2f SCOREBOARD_POSITION{ static_cast<float>(WINDOW_WIDTH / 2 - 160), 170.0f };
@@ -35,7 +36,6 @@ class Screens
 
 	sf::Font m_twosonFont;
 
-	sf::Text m_titleText;
 	sf::Text m_buttonText;
 	sf::Text m_helpText;
 	sf::Text m_enterNameText;
@@ -47,7 +47,7 @@ class Screens
 
 	int m_characterNumber; // Player character number used for character selection
 	int m_helpScreenNumber; // Number of the help screen the player is on
-	bool m_gameOver; // Used to load the scoreboard file only once each time the player dies
+	bool m_scoreboardUpdated; // Used to load the scoreboard file only once each time the player dies
 
 	// Scoreboard
 	std::string m_names[MAX_PLAYERS]; // Setup the name string array
@@ -70,6 +70,8 @@ public:
 	void draw(sf::RenderWindow &t_window, GameState t_gameState, std::string t_playerName, Player &t_player);
 	void drawPauseScreen(sf::RenderWindow &t_window);
 	void drawEndScreen(sf::RenderWindow &t_window, std::string t_playerName, int t_playerScore, int t_playerCharNum, Player t_player);
+	void drawScoreboard(sf::RenderWindow &t_window, Player t_player);
+	void drawScoreboardScreen(sf::RenderWindow &t_window, Player t_player);
 
 	void saveScoreToFile(std::string t_playerName, int t_playerScore, int t_playerCharNum);
 	void readScore();
