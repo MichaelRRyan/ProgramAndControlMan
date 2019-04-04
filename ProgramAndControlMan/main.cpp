@@ -9,8 +9,6 @@
 /// Aprox time taken: 25h 
 /// -----------------------------------
 /// Issues/To-Do:
-/// - Character sprite moves to the left when game is over and reset once (Origin not reset)
-/// - Help screen needs to be filled out
 /// - Scoreboard button needed on main menu
 /// - Menu needs to be redone
 

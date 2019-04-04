@@ -123,8 +123,8 @@ void Game::update(sf::Time t_deltaTime)
 	}
 	else if (m_gameState == GameState::SetupGame)
 	{
-		setupGame();
-		m_gameState = GameState::Gameplay;
+		setupGame(); // Setup the game objects
+		m_gameState = GameState::Gameplay; // Switch to gameplay state
 	}
 }
 
@@ -139,17 +139,17 @@ void Game::render()
 	switch (m_gameState)
 	{
 	case GameState::Gameplay:
-		drawGameplay();
+		drawGameplay(); // Draw the gameplay objects
 		break;
 	case GameState::Pause:
-		drawGameplay();
-		m_menuScreens.drawPauseScreen(m_window);
+		drawGameplay(); // Draw the gameplay objects
+		m_menuScreens.drawPauseScreen(m_window); // Draw the pause screen
 		break;
 	case GameState::GameOver:
-		m_menuScreens.drawEndScreen(m_window, m_playerName, m_player.getScore(), m_player.getCharNum(), m_player);
+		m_menuScreens.drawEndScreen(m_window, m_playerName, m_player.getScore(), m_player.getCharNum(), m_player); // Draw the end screen
 		break;
 	default:
-		m_menuScreens.draw(m_window, m_gameState, m_playerName, m_player);
+		m_menuScreens.draw(m_window, m_gameState, m_playerName, m_player); // Draw the menu screen
 		break;
 	}
 
@@ -177,7 +177,7 @@ void Game::setupGame()
 /// </summary>
 void Game::setupMaze()
 {
-	int mazeSetup[MAX_ROWS][MAX_COLS]{
+	int mazeSetup[MAX_ROWS][MAX_COLS]{ // Setup a temporary 2D maze to setup the main maze
 	{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
 	{ 0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0 },
 	{ 0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0 },
@@ -205,20 +205,20 @@ void Game::setupMaze()
 	{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
 	};
 
-	for (int row = 0; row < MAX_ROWS; row++)
+	for (int row = 0; row < MAX_ROWS; row++) // Loop through rows
 	{
-		for (int col = 0; col < MAX_COLS; col++)
+		for (int col = 0; col < MAX_COLS; col++) // Loops through columns
 		{
-			m_maze[row][col].setTileType(static_cast<Tile>(mazeSetup[row][col]));
+			m_maze[row][col].setTileType(static_cast<Tile>(mazeSetup[row][col])); // Set the type of the tile
 
 			if (mazeSetup[row][col] == 0) // Set coins to any empty spots in the maze
 			{
-				m_maze[row][col].setTileType(Tile::Coin);
+				m_maze[row][col].setTileType(Tile::Coin); // Set a coin to any blank cell
 			}
 
 			if (row == 0 || row == MAX_ROWS - 1 || col == 0 || col == MAX_COLS - 1) // Setup the sides of the maze so that it always has borders
 			{
-				m_maze[row][col].setTileType(Tile::Rock);
+				m_maze[row][col].setTileType(Tile::Rock); // Set walls at each edge
 			}
 		}
 	}
@@ -234,7 +234,10 @@ void Game::setupFontAndText()
 		// Error loading font file
 	}
 	m_scoreText.setFont(m_twosonFont);
+	m_scoreText.setPosition(static_cast<float>(WINDOW_WIDTH / 2 + 70), 0.0f);
+
 	m_livesText.setFont(m_twosonFont);
+	m_livesText.setPosition(static_cast<float>(WINDOW_WIDTH / 2 - 60), 0.0f);
 
 	// Setup the game over text
 	m_gameOverText.setFont(m_twosonFont);
@@ -246,12 +249,14 @@ void Game::setupFontAndText()
 
 /// <summary>
 /// <para>Draws each cell of the maze and the background.</para>
+/// <para>Draw the player and each enemy in order of screen height.</para>
+/// <para>Draw the hud with health and score.</para>
 /// </summary>
 void Game::drawGameplay()
 {
-	for (int row = 0; row < MAX_ROWS; row++)
+	for (int row = 0; row < MAX_ROWS; row++) // Loop rows
 	{
-		for (int col = 0; col < MAX_COLS; col++)
+		for (int col = 0; col < MAX_COLS; col++) // Loop columns
 		{
 			m_tileSprite.setPosition(static_cast<float>(32 * col), static_cast<float>(32 * row)); // Set the x and y of the tile sprite
 			int grassType = (col + row) % 3; // Picks between grass tiles to draw for each tile based off the row and col
@@ -283,6 +288,7 @@ void Game::drawGameplay()
 		}
 	}
 
+	// Set the text and hud icon positions and draw
 	m_hudIcons.setTextureRect({ 64, 0, 288, 32 });
 	m_hudIcons.setPosition(256.0f, 0.0f);
 	m_window.draw(m_hudIcons);
@@ -290,13 +296,11 @@ void Game::drawGameplay()
 	m_hudIcons.setTextureRect({ 0, 0, 32, 32 });
 	m_hudIcons.setPosition(static_cast<float>(WINDOW_WIDTH / 2 - 100), 0.0f);
 	m_window.draw(m_hudIcons);
-	m_livesText.setPosition(static_cast<float>(WINDOW_WIDTH / 2 - 60), 0.0f);
-
+	
 	m_hudIcons.setTextureRect({ 32, 0, 32, 32 });
 	m_hudIcons.setPosition(static_cast<float>(WINDOW_WIDTH / 2 + 20), 0.0f);
 	m_window.draw(m_hudIcons);
-	m_scoreText.setPosition(static_cast<float>(WINDOW_WIDTH / 2 + 70), 0.0f);
-
+	
 	m_window.draw(m_scoreText);
 	m_window.draw(m_livesText);
 }

@@ -27,9 +27,9 @@ void WalkerEnemy::loadFiles()
 	{
 		// Error loading image
 	}
-	m_body.setTexture(m_spriteSheet);
-	m_body.setTextureRect(sf::IntRect{ m_characterNumber.x * 2,m_characterNumber.y,CHAR_WIDTH,CHAR_HEIGHT });
-	m_body.setOrigin(0.0f, static_cast<float>(CHAR_WIDTH));
+	m_body.setTexture(m_spriteSheet); // Set the character texture
+	m_body.setTextureRect(sf::IntRect{ m_characterNumber.x * 2,m_characterNumber.y,CHAR_WIDTH,CHAR_HEIGHT }); // Set the character
+	m_body.setOrigin(0.0f, static_cast<float>(CHAR_WIDTH)); // Set the origin of the sprite to ignore the head part of the sprite
 }
 
 /// <summary>

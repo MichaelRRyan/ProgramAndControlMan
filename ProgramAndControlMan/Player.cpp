@@ -40,14 +40,16 @@ void Player::loadFiles()
 /// </summary>
 void Player::respawn()
 {
-	m_score = 0;
-	m_hurtTimer = 0;
-	m_moveTimer = 0;
-	m_characterDirection = 0;
-	m_lives = 3;
-	setPos({ 12, 2 });
-	m_body.setTextureRect(sf::IntRect{ m_character.x + CHAR_SPACING,m_character.y,CHAR_WIDTH,CHAR_HEIGHT });
-	m_body.setColor(sf::Color::White);
+	m_score = 0; // Reset the score to 0
+	m_hurtTimer = 0; // Set the hurt timer to zero
+	m_moveTimer = 0; // Set the move timer to zero
+	m_characterDirection = 0; // Reset the character direction to 0
+	m_lives = 3; // Reset the lives to 3
+	m_body.setTextureRect(sf::IntRect{ m_character.x + CHAR_SPACING,m_character.y,CHAR_WIDTH,CHAR_HEIGHT }); // Set the texture rectangle
+	m_body.setColor(sf::Color::White); // Set the colour of the sprite to white
+	m_body.setOrigin(0.0f, m_body.getOrigin().y); // reset the origin of the sprite
+	m_body.setScale(1.0f, 1.0f); // Reset the scale of the sprite
+	setPos({ 12, 2 }); // Reset the position of the player
 }
 
 /// <summary>

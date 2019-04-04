@@ -48,48 +48,68 @@ void Screens::loadFiles()
 /// </summary>
 void Screens::setupText()
 {
-	m_titleText.setFont(m_twosonFont);
-	m_titleText.setCharacterSize(80u);
-	m_titleText.setString("PACMAN");
-	m_titleText.setPosition(400.0f, 80.0f);
-	m_titleText.setOrigin(m_titleText.getGlobalBounds().width / 2, 0);
+	m_titleText.setFont(m_twosonFont); // Set the font
+	m_titleText.setCharacterSize(80u); // Set the font size
+	m_titleText.setString("PACMAN"); // Set the string
+	m_titleText.setPosition(400.0f, 80.0f); // Set the text position
+	m_titleText.setOrigin(m_titleText.getGlobalBounds().width / 2, 0); // Centre the text object
 
-	m_buttonText.setFont(m_twosonFont);
-	m_buttonText.setFillColor(sf::Color::Black);
-	m_buttonText.setCharacterSize(40u);
+	m_buttonText.setFont(m_twosonFont); // Set the font
+	m_buttonText.setFillColor(sf::Color::Black); // Set the font colour
+	m_buttonText.setCharacterSize(40u); // Set the font size
 
-	m_nameText.setFont(m_twosonFont);
-	m_nameText.setPosition(400.0f, 450.0f);
-	m_nameText.setCharacterSize(30u);
+	m_nameText.setFont(m_twosonFont); // Set the font
+	m_nameText.setPosition(400.0f, 450.0f); // Set the text position
 
-	m_enterNameText.setFont(m_twosonFont);
-	m_enterNameText.setPosition(400.0f, 350.0f);
-	m_enterNameText.setString("ENTER YOUR NAME:");
-	m_enterNameText.setOrigin(m_titleText.getGlobalBounds().width / 2, 0);
+	m_enterNameText.setFont(m_twosonFont); // Set the font
+	m_enterNameText.setPosition(400.0f, 350.0f); // Set the text position
+	m_enterNameText.setString("ENTER YOUR NAME:"); // Set the string
+	m_enterNameText.setOrigin(m_titleText.getGlobalBounds().width / 2, 0); // Centre the text object
 
-	m_helpText.setFont(m_twosonFont);
-	m_helpText.setPosition(50.0f, 350.0f);
-	m_helpText.setCharacterSize(20u);
-	m_helpText.setLineSpacing(1.2f);
+	m_helpText.setFont(m_twosonFont); // Set the font
+	m_helpText.setPosition(50.0f, 350.0f); // Set the text position
+	m_helpText.setCharacterSize(30u); // Set the font size
+	m_helpText.setLineSpacing(1.2f); // Set the line spacing of the text
 
-	std::string helpTextString = "";
-	helpTextString.append("instructions:\nmovement:\nUSE THE ARROW KEYS TO MOVE AROUND\nTHE MAZE.");
-	helpTextString.append("\ngoal:\nPICKUP ALL THE PELLETS IN THE LEVEL\nAND YOU WIN.\nTRY TO SURVIVE AS MANY LEVELS AS POSSIBLE\nAND GET THE HIGHEST SCORE.");
-	helpTextString.append("\nghosts:\nTHE RED GHOSTS ARE EVIL DONT TOUCH\nTHEM OR YOU WILL LOSE A LIFE.\nLOSE ALL YOUR LIVES AND YOU LOSE.");
-	m_helpText.setString(helpTextString);
+	m_pauseText.setFont(m_twosonFont); // Set the font
+	m_pauseText.setPosition(310.0f, 350.0f); // Set the text position
+	m_pauseText.setString("PAUSE"); // Set the string
+	m_pauseText.setCharacterSize(40u); // Set the font size
 
-	m_pauseText.setFont(m_twosonFont);
-	m_pauseText.setPosition(310.0f, 350.0f);
-	m_pauseText.setString("PAUSE");
-	m_pauseText.setCharacterSize(40u);
+	m_endText.setFont(m_twosonFont); // Set the font
+	m_endText.setPosition(240.0f, 10.0f); // Set the text position
+	m_endText.setString("GAME OVER"); // Set the string
+	m_endText.setCharacterSize(50u); // Set the font size
 
-	m_endText.setFont(m_twosonFont);
-	m_endText.setPosition(240.0f, 10.0f);
-	m_endText.setString("GAME OVER");
-	m_endText.setCharacterSize(50u);
+	m_scoreboardText.setFont(m_twosonFont); // Set the font
+	m_yourScoreText.setFont(m_twosonFont); // Set the font
+}
 
-	m_scoreboardText.setFont(m_twosonFont);
-	m_yourScoreText.setFont(m_twosonFont);
+/// <summary>
+/// Setup the help text to the specific screen number inputted
+/// </summary>
+/// <param name="t_screenNumber"></param>
+void Screens::setupHelpText(int t_screenNumber)
+{
+	std::string helpTextString = ""; // Setup a temporary string to setup the help text
+
+	switch (t_screenNumber)
+	{
+	case 0:
+		helpTextString.append("instructions:\nmovement:\nUSE THE ARROW KEYS TO MOVE AROUND\nTHE MAZE.");
+		helpTextString.append("\nWalk into the white rocks to push\nthem around the maze to block enemies\nor clear a path.");
+		break;
+	case 1:
+		helpTextString.append("instructions:\ngoal:");
+		helpTextString.append("\nPICKUP ALL THE BERRIES IN THE LEVEL\nAND YOU WIN.\nTRY TO SURVIVE AS MANY LEVELS AS\nPOSSIBLE AND GET THE HIGHEST SCORE.");
+		break;
+	case 2:
+		helpTextString.append("instructions:\nEnemies:\nTHE WANDERING MEN ARE EVIL, DONT TOUCH\nTHEM OR YOU WILL LOSE A LIFE.\nLOSE ALL YOUR LIVES AND YOU LOSE.");
+		helpTextString.append("\nTry to keep a distance from the men or\nthey will spot you and chase you.");
+		break;
+	}
+
+	m_helpText.setString(helpTextString); // Set the string
 }
 
 /// <summary>
@@ -104,19 +124,20 @@ void Screens::processEvents(sf::Event t_event, GameState & t_gameState, std::str
 	switch (t_gameState)
 	{
 	case GameState::MenuScreen:
-		menuEvents(t_event, t_gameState, t_gameOver, t_playerName);
+		menuEvents(t_event, t_gameState, t_gameOver, t_playerName, t_player); // Process the menu events
 		break;
 	case GameState::NameScreen:
-		nameScreenEvents(t_event, t_gameState, t_playerName);
+		nameScreenEvents(t_event, t_gameState, t_playerName); // Process the name screen events
 		break;
 	case GameState::HelpScreen:
-		backButtonEvents(t_event, t_gameState);
+		backButtonEvents(t_event, t_gameState); // Process the back button events
+		nextHelpEvents(t_event); // Process the next button events
 		break;
 	case GameState::CharacterScreen:
-		characterScreenEvents(t_event, t_gameState, t_player);
+		characterScreenEvents(t_event, t_gameState, t_player); // Process the character screen events
 		break;
 	case GameState::GameOver:
-		backButtonEvents(t_event, t_gameState);
+		backButtonEvents(t_event, t_gameState); // Process the back button events
 		break;
 	}
 }
@@ -127,12 +148,12 @@ void Screens::processEvents(sf::Event t_event, GameState & t_gameState, std::str
 /// <param name="t_event">User event</param>
 /// <param name="t_gameState">Game state</param>
 /// <param name="t_gameOver">Game over bool</param>
-void Screens::menuEvents(sf::Event t_event, GameState & t_gameState, bool & t_gameOver, std::string & t_playerName)
+void Screens::menuEvents(sf::Event t_event, GameState & t_gameState, bool & t_gameOver, std::string & t_playerName, Player &t_player)
 {
-	if (sf::Event::MouseButtonPressed == t_event.type)
+	if (sf::Event::MouseButtonPressed == t_event.type) // Check if a mouse button was pressed
 	{
 
-		if (sf::Mouse::Left == t_event.mouseButton.button)
+		if (sf::Mouse::Left == t_event.mouseButton.button) // Check if the button press was the left mouse button
 		{
 			// Check that the click was within the horisontal bounds of the buttons
 			if (t_event.mouseButton.x > BUTTON_ONE_POSITION.x - BUTTON_WIDTH / 2 && t_event.mouseButton.x < BUTTON_ONE_POSITION.x + BUTTON_WIDTH / 2)
@@ -143,16 +164,19 @@ void Screens::menuEvents(sf::Event t_event, GameState & t_gameState, bool & t_ga
 					t_gameState = GameState::NameScreen;
 					m_characterNumber = 0;
 					t_playerName = "";
+					t_player.respawn();
 				}
 				// Check that the click is within the vertical bounds of the second the button (Help)
 				if (t_event.mouseButton.y > BUTTON_TWO_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_TWO_POSITION.y + BUTTON_HEIGHT / 2)
 				{
 					t_gameState = GameState::HelpScreen;
+					m_helpScreenNumber = 0; // Set the help screen to the first screen
+					setupHelpText(0); // Setup the help text for the first screen
 				}
 				// Check that the click is within the vertical bounds of the last the button (Exit)
 				if (t_event.mouseButton.y > BUTTON_THREE_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_THREE_POSITION.y + BUTTON_HEIGHT / 2)
 				{
-					t_gameOver = true;;
+					t_gameOver = true;
 				}
 			}
 		}
@@ -217,12 +241,49 @@ void Screens::backButtonEvents(sf::Event t_event, GameState & t_gameState)
 		if (sf::Mouse::Left == t_event.mouseButton.button)
 		{
 			// Check that the click was within the horisontal bounds of the buttons
-			if (t_event.mouseButton.x > BUTTON_BACK_POSITION.x - BUTTON_WIDTH / 2 && t_event.mouseButton.x < BUTTON_BACK_POSITION.x + BUTTON_WIDTH / 2)
+			if (t_event.mouseButton.x > BUTTON_MENU_POSITION.x - BUTTON_WIDTH / 2 && t_event.mouseButton.x < BUTTON_MENU_POSITION.x + BUTTON_WIDTH / 2)
 			{
 				// Check that the click is within the vertical bounds of the first the button (Start)
-				if (t_event.mouseButton.y > BUTTON_BACK_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_BACK_POSITION.y + BUTTON_HEIGHT / 2)
+				if (t_event.mouseButton.y > BUTTON_MENU_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_MENU_POSITION.y + BUTTON_HEIGHT / 2)
 				{
 					t_gameState = GameState::MenuScreen;
+				}
+			}
+		}
+	}
+}
+
+/// <summary>
+/// Process events for the next and back buttons for the help screen.
+/// </summary>
+/// <param name="t_event"></param>
+void Screens::nextHelpEvents(sf::Event t_event)
+{
+	if (sf::Event::KeyPressed == t_event.type)
+	{
+		if (sf::Keyboard::Right == t_event.key.code)
+		{
+			m_helpScreenNumber++;
+			if (m_helpScreenNumber >= HELP_SCREENS)
+				m_helpScreenNumber = 0;
+			setupHelpText(m_helpScreenNumber);
+		}
+	}
+	if (sf::Event::MouseButtonPressed == t_event.type)
+	{
+
+		if (sf::Mouse::Left == t_event.mouseButton.button)
+		{
+			// Check that the click was within the horisontal bounds of the buttons
+			if (t_event.mouseButton.x > BUTTON_NEXT_POSITION.x - BUTTON_WIDTH / 2 && t_event.mouseButton.x < BUTTON_NEXT_POSITION.x + BUTTON_WIDTH / 2)
+			{
+				// Check that the click is within the vertical bounds of the first the button (Start)
+				if (t_event.mouseButton.y > BUTTON_NEXT_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_NEXT_POSITION.y + BUTTON_HEIGHT / 2)
+				{
+					m_helpScreenNumber++;
+					if (m_helpScreenNumber >= HELP_SCREENS)
+						m_helpScreenNumber = 0;
+					setupHelpText(m_helpScreenNumber);
 				}
 			}
 		}
@@ -269,7 +330,7 @@ void Screens::characterScreenEvents(sf::Event t_event, GameState & t_gameState, 
 /// <param name="t_window">Game window</param>
 /// <param name="t_gameState">Game state</param>
 /// <param name="t_playerName">Player's name</param>
-void Screens::draw(sf::RenderWindow & t_window, GameState t_gameState, std::string t_playerName, Player & t_player)
+void Screens::draw(sf::RenderWindow & t_window, GameState t_gameState, std::string t_playerName, Player &t_player)
 {
 	t_window.draw(m_backgroundSprite);
 
@@ -304,13 +365,20 @@ void Screens::draw(sf::RenderWindow & t_window, GameState t_gameState, std::stri
 		t_window.draw(m_enterNameText);
 		break;
 	case GameState::HelpScreen:
-		m_buttonText.setString("back");
+		m_buttonText.setString("menu");
 		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
-		m_buttonText.setPosition(BUTTON_BACK_POSITION);
-		m_buttonSprite.setPosition(BUTTON_BACK_POSITION);
+		m_buttonText.setPosition(BUTTON_MENU_POSITION);
+		m_buttonSprite.setPosition(BUTTON_MENU_POSITION);
 		t_window.draw(m_buttonSprite);
 		t_window.draw(m_buttonText);
 		t_window.draw(m_helpText);
+
+		m_buttonText.setString("next");
+		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
+		m_buttonText.setPosition(BUTTON_NEXT_POSITION);
+		m_buttonSprite.setPosition(BUTTON_NEXT_POSITION);
+		t_window.draw(m_buttonSprite);
+		t_window.draw(m_buttonText);
 		break;
 	case GameState::CharacterScreen:
 		m_arrowSprite.setScale(1.0f, 1.0f);
@@ -344,17 +412,14 @@ void Screens::drawEndScreen(sf::RenderWindow & t_window, std::string t_playerNam
 	if (!m_gameOver)
 	{
 		saveScoreToFile(t_playerName, t_playerScore, t_playerCharNum);
-		m_characterNumber = t_playerCharNum;
 		m_gameOver = true;
-		t_player.setScale({ 1.0f,1.0f });
-		// Set origin?
 	}
 	
 	t_window.draw(m_endText); // Draw the end screen text
 
 	// Display the player's score
 	t_player.setPosition({ YOUR_SCORE_POSITION.x, YOUR_SCORE_POSITION.y + 16 });
-	t_player.setCharacter(m_characterNumber);
+	t_player.setCharacter(t_playerCharNum);
 	t_window.draw(t_player.getBody());
 
 	m_scoreboardText.setFillColor(sf::Color::Blue);
@@ -386,8 +451,8 @@ void Screens::drawEndScreen(sf::RenderWindow & t_window, std::string t_playerNam
 	// Setup and display the button
 	m_buttonText.setString("menu");
 	m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
-	m_buttonText.setPosition(BUTTON_BACK_POSITION);
-	m_buttonSprite.setPosition(BUTTON_BACK_POSITION);
+	m_buttonText.setPosition(BUTTON_MENU_POSITION);
+	m_buttonSprite.setPosition(BUTTON_MENU_POSITION);
 	t_window.draw(m_buttonSprite);
 	t_window.draw(m_buttonText);
 }

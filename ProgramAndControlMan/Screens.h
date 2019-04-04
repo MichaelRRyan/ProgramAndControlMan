@@ -1,6 +1,6 @@
 /// @Author Michael Rainsford Ryan
 #ifndef SCREENS_H
-#define SCREEENS_H
+#define SCREENS_H
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -13,10 +13,13 @@ const int BUTTON_IMAGE_HEIGHT{ 49 };
 const int BUTTON_WIDTH{ 342 };
 const int BUTTON_HEIGHT{ 88 };
 
+const int HELP_SCREENS{ 3 };
+
 const sf::Vector2f BUTTON_ONE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 400.0f };
 const sf::Vector2f BUTTON_TWO_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 520.0f };
 const sf::Vector2f BUTTON_THREE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2), 640.0f };
-const sf::Vector2f BUTTON_BACK_POSITION{ static_cast<float>(BUTTON_IMAGE_WIDTH), static_cast<float>(WINDOW_HEIGHT - 60) };
+const sf::Vector2f BUTTON_MENU_POSITION{ static_cast<float>(BUTTON_IMAGE_WIDTH), static_cast<float>(WINDOW_HEIGHT - 60) };
+const sf::Vector2f BUTTON_NEXT_POSITION{ static_cast<float>(WINDOW_WIDTH - BUTTON_IMAGE_WIDTH), static_cast<float>(WINDOW_HEIGHT - 60) };
 const sf::Vector2f SCOREBOARD_POSITION{ static_cast<float>(WINDOW_WIDTH / 2 - 160), 170.0f };
 const sf::Vector2f YOUR_SCORE_POSITION{ static_cast<float>(WINDOW_WIDTH / 2 - 160), 100.0f };
 
@@ -43,6 +46,7 @@ class Screens
 	sf::Text m_yourScoreText;
 
 	int m_characterNumber; // Player character number used for character selection
+	int m_helpScreenNumber; // Number of the help screen the player is on
 	bool m_gameOver; // Used to load the scoreboard file only once each time the player dies
 
 	// Scoreboard
@@ -54,13 +58,16 @@ public:
 	Screens();
 	void loadFiles();
 	void setupText();
-	void processEvents(sf::Event t_event, GameState & t_gameState, std::string & t_playerName, bool &t_gameOver, Player &t_player);
-	void menuEvents(sf::Event t_event, GameState & t_gameState, bool &t_gameOver, std::string & t_playerName);
-	void nameScreenEvents(sf::Event t_event, GameState & t_gameState, std::string & t_playerName);
-	void backButtonEvents(sf::Event t_event, GameState & t_gameState);
-	void characterScreenEvents(sf::Event t_event, GameState & t_gameState, Player &t_player);
+	void setupHelpText(int t_screenNumber); // Sets up the health text to the screen number inputted
 
-	void draw(sf::RenderWindow & t_window, GameState t_gameState, std::string t_playerName, Player & t_player);
+	void processEvents(sf::Event t_event, GameState &t_gameState, std::string & t_playerName, bool &t_gameOver, Player &t_player);
+	void menuEvents(sf::Event t_event, GameState &t_gameState, bool &t_gameOver, std::string &t_playerName, Player &t_player);
+	void nameScreenEvents(sf::Event t_event, GameState &t_gameState, std::string &t_playerName);
+	void backButtonEvents(sf::Event t_event, GameState &t_gameState);
+	void nextHelpEvents(sf::Event t_event); // Process events for the help menu next button
+	void characterScreenEvents(sf::Event t_event, GameState &t_gameState, Player &t_player);
+
+	void draw(sf::RenderWindow &t_window, GameState t_gameState, std::string t_playerName, Player &t_player);
 	void drawPauseScreen(sf::RenderWindow &t_window);
 	void drawEndScreen(sf::RenderWindow &t_window, std::string t_playerName, int t_playerScore, int t_playerCharNum, Player t_player);
 
