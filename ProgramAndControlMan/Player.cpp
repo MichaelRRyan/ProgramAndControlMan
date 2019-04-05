@@ -2,7 +2,7 @@
 #include "Player.h"
 
 Player::Player() :
-	// Setup the character positions 
+	// Setup the character texture positions 
 	m_characterPositions{
 	{ CHAR_SPACING * 5, CHAR_HEIGHT * 24 },
 	{ CHAR_SPACING * 5, CHAR_HEIGHT * 27},
@@ -18,6 +18,7 @@ Player::Player() :
 	// Initialise the player variables
 	loadFiles();
 	respawn();
+	m_overallScore = 0;
 }
 
 /// <summary>
@@ -116,6 +117,7 @@ void Player::move(Direction t_direction, Cell t_maze[][MAX_COLS])
 	{
 		t_maze[m_pos.y][m_pos.x ].setTileType(Tile::None); // Remove coin
 		m_score++; // Add to score
+		m_overallScore++; // Add to the overall score to display
 	}
 }
 
@@ -160,36 +162,14 @@ void Player::update(Cell t_maze[][MAX_COLS], GameState & t_gameState)
 {
 	if (m_moveTimer == 0) // the player can move if the movement timer is zero
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) // Upwards movement
-		{
-			move(Direction::North, t_maze);
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) // Downwards movement
-		{
-			move(Direction::South, t_maze);
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) // Right movement
-		{
-			move(Direction::East, t_maze);
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) // Left movement
-		{
-			move(Direction::West, t_maze);
-		}
+		movementInput(t_maze);
 
 		// Set the standing sprite of the player
 		m_body.setTextureRect(sf::IntRect{ m_character.x + CHAR_SPACING,m_character.y + m_characterDirection * CHAR_HEIGHT,CHAR_WIDTH,CHAR_HEIGHT });
 	}
 	else
 	{
-		m_moveTimer--; // Decrement the movement timer
-		// Work out the new X and Y with Linear Interpolation
-		float newX = (m_pos.x * 32) * (1.0f - (1.0f * m_moveTimer / MOVEMENT_TIME)) + (m_previousPos.x * 32) * (1.0f * m_moveTimer / MOVEMENT_TIME);
-		float newY = (m_pos.y * 32) * (1.0f - (1.0f * m_moveTimer / MOVEMENT_TIME)) + (m_previousPos.y * 32) * (1.0f * m_moveTimer / MOVEMENT_TIME);
-		m_body.setPosition(static_cast<float>(newX), static_cast<float>(newY)); // Set the position to the current cell
-
-		int frameNum = static_cast<int>((1.0 * m_moveTimer / MOVEMENT_TIME) * 3); // Work out the animation frame number based off the movement timer
-		m_body.setTextureRect(sf::IntRect{ m_character.x + (CHAR_SPACING * frameNum), m_character.y + (m_characterDirection * CHAR_HEIGHT),CHAR_WIDTH, CHAR_HEIGHT });
+		animations();
 	}
 
 	if (m_hurtTimer > 0) // Decrement the hurt timer if it's greater than 0
@@ -205,6 +185,53 @@ void Player::update(Cell t_maze[][MAX_COLS], GameState & t_gameState)
 		m_body.setColor(sf::Color::White);
 	    m_lives = 0; // Set lives to 0 to avoid displaying -1
 	}
+
+	if (m_score >= MAX_SCORE)
+	{
+		t_gameState = GameState::SetupGame;
+	}
+}
+
+/// <summary>
+/// Manages player movement input
+/// </summary>
+/// <param name="t_maze">Maze array</param>
+void Player::movementInput(Cell t_maze[][MAX_COLS])
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) // Upwards movement
+	{
+		move(Direction::North, t_maze);
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) // Downwards movement
+	{
+		move(Direction::South, t_maze);
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) // Right movement
+	{
+		move(Direction::East, t_maze);
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) // Left movement
+	{
+		move(Direction::West, t_maze);
+	}
+}
+
+/// <summary>
+/// Takes care of animations for the player movement.
+/// </summary>
+void Player::animations()
+{
+	m_moveTimer--; // Decrement the movement timer
+	
+				   // Work out the new X and Y with Linear Interpolation
+	float newX = (m_pos.x * 32) * (1.0f - (1.0f * m_moveTimer / MOVEMENT_TIME)) + (m_previousPos.x * 32) * (1.0f * m_moveTimer / MOVEMENT_TIME);
+	float newY = (m_pos.y * 32) * (1.0f - (1.0f * m_moveTimer / MOVEMENT_TIME)) + (m_previousPos.y * 32) * (1.0f * m_moveTimer / MOVEMENT_TIME);
+
+	m_body.setPosition(static_cast<float>(newX), static_cast<float>(newY)); // Set the position to the current cell
+
+	int frameNum = static_cast<int>((1.0 * m_moveTimer / MOVEMENT_TIME) * 3); // Work out the animation frame number based off the movement timer
+	// Set the texture rectangle based off the frame number
+	m_body.setTextureRect(sf::IntRect{ m_character.x + (CHAR_SPACING * frameNum), m_character.y + (m_characterDirection * CHAR_HEIGHT),CHAR_WIDTH, CHAR_HEIGHT });
 }
 
 /// <summary>

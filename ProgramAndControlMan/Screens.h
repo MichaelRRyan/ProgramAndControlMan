@@ -30,12 +30,14 @@ class Screens
 	sf::Texture m_backgroundTexture;
 	sf::Texture m_buttonTexture;
 
+	// Sprites
 	sf::Sprite m_backgroundSprite;
 	sf::Sprite m_buttonSprite;
 	sf::Sprite m_arrowSprite;
 
+	// Text objects and font
 	sf::Font m_twosonFont;
-
+	
 	sf::Text m_buttonText;
 	sf::Text m_helpText;
 	sf::Text m_enterNameText;
@@ -48,6 +50,7 @@ class Screens
 	int m_characterNumber; // Player character number used for character selection
 	int m_helpScreenNumber; // Number of the help screen the player is on
 	bool m_scoreboardUpdated; // Used to load the scoreboard file only once each time the player dies
+	sf::RectangleShape m_renderSquare; // Transparent render square for drawing the pause screen
 
 	// Scoreboard
 	std::string m_names[MAX_PLAYERS]; // Setup the name string array
@@ -68,10 +71,14 @@ public:
 	void characterScreenEvents(sf::Event t_event, GameState &t_gameState, Player &t_player);
 
 	void draw(sf::RenderWindow &t_window, GameState t_gameState, std::string t_playerName, Player &t_player);
+	void drawMenuScreen(sf::RenderWindow &t_window);
+	void drawHelpScreen(sf::RenderWindow &t_window);
+	void drawNameScreen(sf::RenderWindow &t_window, std::string t_playerName);
+	void drawCharacterScreen(sf::RenderWindow &t_window, Player &t_player);
 	void drawPauseScreen(sf::RenderWindow &t_window);
 	void drawEndScreen(sf::RenderWindow &t_window, std::string t_playerName, int t_playerScore, int t_playerCharNum, Player t_player);
-	void drawScoreboard(sf::RenderWindow &t_window, Player t_player);
 	void drawScoreboardScreen(sf::RenderWindow &t_window, Player t_player);
+	void drawScoreboard(sf::RenderWindow &t_window, Player t_player);
 
 	void saveScoreToFile(std::string t_playerName, int t_playerScore, int t_playerCharNum);
 	void readScore();

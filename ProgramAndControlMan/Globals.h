@@ -45,7 +45,7 @@ const int CHAR_WIDTH{ 32 }; // Character Width - the width of each character spr
 const int CHAR_HEIGHT{ 64 }; // Character height - the height of each character sprite
 const int CHAR_SPACING{ 54 }; // The horisontal spacing between each character on the sprite sheet (including margin)
 
-const int MAX_SCORE{ 412 }; // The number of points the player has to score to win
+const int MAX_SCORE{ 312 }; // The number of points the player has to score to win
 const int MAX_PLAYERS{ 10 }; // The number of players saved to a scoreboard
 
 // Global game functions

@@ -143,7 +143,7 @@ void Game::render()
 		break;
 	case GameState::Pause:
 		drawGameplay(); // Draw the gameplay objects
-		m_menuScreens.drawPauseScreen(m_window); // Draw the pause screen
+		m_menuScreens.draw(m_window, m_gameState, m_playerName, m_player); // Draw the pause screen
 		break;
 	case GameState::GameOver:
 		m_menuScreens.drawEndScreen(m_window, m_playerName, m_player.getScore(), m_player.getCharNum(), m_player); // Draw the end screen
@@ -238,13 +238,6 @@ void Game::setupFontAndText()
 
 	m_livesText.setFont(m_twosonFont);
 	m_livesText.setPosition(static_cast<float>(WINDOW_WIDTH / 2 - 60), 0.0f);
-
-	// Setup the game over text
-	m_gameOverText.setFont(m_twosonFont);
-	m_gameOverText.setString("GAME OVER");
-	m_gameOverText.setCharacterSize(50u);
-	m_gameOverText.setOrigin(m_gameOverText.getGlobalBounds().width / 2, m_gameOverText.getGlobalBounds().height / 2);
-	m_gameOverText.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
 }
 
 /// <summary>

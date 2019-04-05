@@ -25,7 +25,8 @@ class Player
 	sf::Sprite m_body;
 	sf::Vector2i m_pos;
 	sf::Vector2i m_previousPos; // Used for animation
-	int m_score;
+	int m_overallScore; // Score for each game played
+	int m_score; // Score for each round played
 	int m_lives;
 	int m_hurtTimer; // The timer the player can be invincible for after being damaged
 	int m_moveTimer;
@@ -43,7 +44,7 @@ public:
 	void respawn();
 
 	void setPos(sf::Vector2i t_pos); // Set the row and column position of the player
-	inline void setScore(int t_score) { m_score = t_score; }
+	inline void setScore(int t_score) { m_overallScore = t_score; } // Sets the overall score of the player
 	inline void setLives(int t_lives) { m_lives = t_lives; } // Set the number of lives for the player
 	inline void setPosition(sf::Vector2f t_position) { m_body.setPosition(t_position); } // Sets the position of the player sprite
 	inline void setScale(sf::Vector2f t_scale) { m_body.setScale(t_scale); } // Sets the scale of the player sprite
@@ -52,13 +53,15 @@ public:
 
 	inline sf::Vector2i getPos() { return m_pos; } // get the row and col position of the player
 	inline sf::Sprite getBody() { return m_body; }
-	inline int getScore() { return m_score; } // Returns the score of the player
+	inline int getScore() { return m_overallScore; } // Returns the overall score of the player
 	inline int getLives() { return m_lives; } // Returns the lives of the player
 	inline int getCharNum() { return m_characterNumber; } // Returns the character number of the player
 
 	void move(Direction t_direction, Cell t_maze[][MAX_COLS]);
 	void setTextureDirection(Direction t_direction);
 	void update(Cell t_maze[][MAX_COLS], GameState &t_gameState);
+	void movementInput(Cell t_maze[][MAX_COLS]);
+	void animations();
 	void checkCollision(WalkerEnemy &t_enemy);
 };
 

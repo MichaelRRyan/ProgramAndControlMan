@@ -18,7 +18,6 @@ public:
 	~Game();
 
 	void run();
-
 private:
 	void processEvents();
 	void update(sf::Time t_deltaTime);
@@ -28,29 +27,28 @@ private:
 	void setupFontAndText();
 	void drawGameplay();
 
-	sf::RenderWindow m_window;
-	bool m_exitGame;
+	sf::RenderWindow m_window; // Render window
+	bool m_exitGame; // Closes the window if true
 
-	GameState m_gameState;
+	GameState m_gameState; // Current game state
 
-	Cell m_maze[MAX_ROWS][MAX_COLS];
-	WalkerEnemy m_ghosts[MAX_GHOSTS];
-	Player m_player;
-	Screens m_menuScreens;
+	Cell m_maze[MAX_ROWS][MAX_COLS]; // Cell array to make the maze
+	WalkerEnemy m_ghosts[MAX_GHOSTS]; // Enemies array
+	Player m_player; // Player object
+	Screens m_menuScreens; // Screens object
 	
-	sf::Font m_twosonFont;
+	sf::Font m_twosonFont; // Font for text objects
 
-	sf::Text m_scoreText;
-	sf::Text m_livesText;
-	sf::Text m_gameOverText;
+	sf::Text m_scoreText; // Text for player score
+	sf::Text m_livesText; // Text for player lives
 
-	sf::Texture m_terrainTexture;
-	sf::Texture m_hudIconsTexure;
+	sf::Texture m_terrainTexture; // Textures for the tiles
+	sf::Texture m_hudIconsTexure; // Textures for the hud
 
-	sf::Sprite m_tileSprite;
-	sf::Sprite m_hudIcons;
+	sf::Sprite m_tileSprite; // sprite for each tile
+	sf::Sprite m_hudIcons; // Icons for the player's hud
 
-	std::string m_playerName;
+	std::string m_playerName; // Players name string
 };
 
 #endif // !GAME

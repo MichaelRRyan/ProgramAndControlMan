@@ -13,13 +13,19 @@ Screens::Screens() :
 
 	m_backgroundSprite.setTexture(m_backgroundTexture); // Set the background texture to the sprite
 
+	// Setup the button sprites
 	m_buttonSprite.setTexture(m_buttonTexture);
 	m_buttonSprite.setTextureRect(sf::IntRect{ BUTTON_IMAGE_WIDTH,45,BUTTON_IMAGE_WIDTH,BUTTON_IMAGE_HEIGHT });
 	m_buttonSprite.setOrigin(BUTTON_IMAGE_WIDTH / 2, BUTTON_IMAGE_HEIGHT / 2);
 	m_buttonSprite.setScale(1.8f, 1.8f);
 
+	// Setup the arrow sprites
 	m_arrowSprite.setTexture(m_buttonTexture);
 	m_arrowSprite.setTextureRect(sf::IntRect{ 339,143,39,31 });
+
+	// Setup the render square sprite (used as a semi transparent background cover)
+	m_renderSquare.setSize({ static_cast<float>(WINDOW_WIDTH),static_cast<float>(WINDOW_HEIGHT) });
+	m_renderSquare.setFillColor(sf::Color{ 255,255,255,100 });
 }
 
 /// <summary>
@@ -87,7 +93,7 @@ void Screens::setupHelpText(int t_screenNumber)
 {
 	std::string helpTextString = ""; // Setup a temporary string to setup the help text
 
-	switch (t_screenNumber)
+	switch (t_screenNumber) // Setup the text for the current help screen
 	{
 	case 0:
 		helpTextString.append("instructions:\nmovement:\nUSE THE ARROW KEYS TO MOVE AROUND\nTHE MAZE.");
@@ -133,6 +139,9 @@ void Screens::processEvents(sf::Event t_event, GameState & t_gameState, std::str
 	case GameState::GameOver:
 		backButtonEvents(t_event, t_gameState); // Process the back button events
 		break;
+	case GameState::ScoreboardScreen :
+		backButtonEvents(t_event, t_gameState); // Process the back button events
+		break;
 	}
 }
 
@@ -158,6 +167,7 @@ void Screens::menuEvents(sf::Event t_event, GameState & t_gameState, bool & t_ga
 					t_gameState = GameState::NameScreen;
 					m_characterNumber = 0;
 					t_playerName = "";
+					t_player.setScore(0); // Set the overall score of the player
 					t_player.respawn();
 				}
 				// Check that the click is within the vertical bounds of the second the button (Help)
@@ -232,6 +242,7 @@ void Screens::backButtonEvents(sf::Event t_event, GameState & t_gameState)
 		if (sf::Keyboard::Escape == t_event.key.code)
 		{
 			t_gameState = GameState::MenuScreen;
+			m_scoreboardUpdated = false;
 		}
 	}
 	if (sf::Event::MouseButtonPressed == t_event.type)
@@ -246,6 +257,7 @@ void Screens::backButtonEvents(sf::Event t_event, GameState & t_gameState)
 				if (t_event.mouseButton.y > BUTTON_MENU_POSITION.y - BUTTON_HEIGHT / 2 && t_event.mouseButton.y < BUTTON_MENU_POSITION.y + BUTTON_HEIGHT / 2)
 				{
 					t_gameState = GameState::MenuScreen;
+					m_scoreboardUpdated = false;
 				}
 			}
 		}
@@ -316,7 +328,6 @@ void Screens::characterScreenEvents(sf::Event t_event, GameState & t_gameState, 
 		{
 			t_player.setScale({ 1.0f,1.0f });
 			t_player.refreshPosition();
-			m_scoreboardUpdated = false;
 			t_gameState = GameState::SetupGame;
 		}
 	}
@@ -331,71 +342,128 @@ void Screens::characterScreenEvents(sf::Event t_event, GameState & t_gameState, 
 /// <param name="t_playerName">Player's name</param>
 void Screens::draw(sf::RenderWindow & t_window, GameState t_gameState, std::string t_playerName, Player &t_player)
 {
-	t_window.draw(m_backgroundSprite);
+	if (t_gameState != GameState::Pause)
+		t_window.draw(m_backgroundSprite); // Draw the background sprite
 
-	switch (t_gameState)
+	switch (t_gameState) // Draw the current screen
 	{
 	case GameState::MenuScreen:
-		m_buttonText.setString("start");
-		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
-		m_buttonText.setPosition(BUTTON_START_POSITION);
-		m_buttonSprite.setPosition(BUTTON_START_POSITION);
-		t_window.draw(m_buttonSprite);
-		t_window.draw(m_buttonText);
-
-		m_buttonText.setString("help");
-		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
-		m_buttonText.setPosition(BUTTON_HELP_POSITION);
-		m_buttonSprite.setPosition(BUTTON_HELP_POSITION);
-		t_window.draw(m_buttonSprite);
-		t_window.draw(m_buttonText);
-
-		m_buttonText.setString("scoreboard");
-		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
-		m_buttonText.setPosition(BUTTON_SCOREBOARD_POSITION);
-		m_buttonSprite.setPosition(BUTTON_SCOREBOARD_POSITION);
-		t_window.draw(m_buttonSprite);
-		t_window.draw(m_buttonText);
-
-		m_buttonText.setString("exit");
-		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
-		m_buttonText.setPosition(BUTTON_EXIT_POSITION);
-		m_buttonSprite.setPosition(BUTTON_EXIT_POSITION);
-		t_window.draw(m_buttonSprite);
-		t_window.draw(m_buttonText);
+		drawMenuScreen(t_window);
 		break;
 	case GameState::NameScreen:
-		m_nameText.setString(t_playerName);
-		m_nameText.setOrigin(static_cast<float>(m_nameText.getGlobalBounds().width / 2), static_cast<float>(m_nameText.getGlobalBounds().height / 1.5));
-		t_window.draw(m_nameText);
-		t_window.draw(m_enterNameText);
+		drawNameScreen(t_window, t_playerName);
 		break;
 	case GameState::HelpScreen:
-		m_buttonText.setString("menu");
-		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
-		m_buttonText.setPosition(BUTTON_MENU_POSITION);
-		m_buttonSprite.setPosition(BUTTON_MENU_POSITION);
-		t_window.draw(m_buttonSprite);
-		t_window.draw(m_buttonText);
-		t_window.draw(m_helpText);
-
-		m_buttonText.setString("next");
-		m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
-		m_buttonText.setPosition(BUTTON_NEXT_POSITION);
-		m_buttonSprite.setPosition(BUTTON_NEXT_POSITION);
-		t_window.draw(m_buttonSprite);
-		t_window.draw(m_buttonText);
+		drawHelpScreen(t_window);
 		break;
 	case GameState::CharacterScreen:
-		m_arrowSprite.setScale(1.0f, 1.0f);
-		m_arrowSprite.setPosition(static_cast<float>(WINDOW_WIDTH / 2 - 150), static_cast<float>(WINDOW_HEIGHT / 2));
-		t_window.draw(m_arrowSprite);
-		m_arrowSprite.setScale(-1.0f, 1.0f);
-		m_arrowSprite.setPosition(static_cast<float>(WINDOW_WIDTH / 2 + 150), static_cast<float>(WINDOW_HEIGHT / 2));
-		t_window.draw(m_arrowSprite);
-		t_window.draw(t_player.getBody());
+		drawCharacterScreen(t_window, t_player);
+		break;
+	case GameState::Pause:
+		drawPauseScreen(t_window);
+		break;
+	case GameState::ScoreboardScreen:
+		drawScoreboardScreen(t_window, t_player);
 		break;
 	}
+}
+
+/// <summary>
+/// Draw the menu screen buttons.
+/// </summary>
+/// <param name="t_window">Render window</param>
+void Screens::drawMenuScreen(sf::RenderWindow & t_window)
+{
+	// Setup and draw the first button
+	m_buttonText.setString("start");
+	m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
+	m_buttonText.setPosition(BUTTON_START_POSITION);
+	m_buttonSprite.setPosition(BUTTON_START_POSITION);
+	t_window.draw(m_buttonSprite);
+	t_window.draw(m_buttonText);
+
+	// Setup and draw the second button
+	m_buttonText.setString("help");
+	m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
+	m_buttonText.setPosition(BUTTON_HELP_POSITION);
+	m_buttonSprite.setPosition(BUTTON_HELP_POSITION);
+	t_window.draw(m_buttonSprite);
+	t_window.draw(m_buttonText);
+
+	// Setup and draw the third button
+	m_buttonText.setString("scoreboard");
+	m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
+	m_buttonText.setPosition(BUTTON_SCOREBOARD_POSITION);
+	m_buttonSprite.setPosition(BUTTON_SCOREBOARD_POSITION);
+	t_window.draw(m_buttonSprite);
+	t_window.draw(m_buttonText);
+
+	// Setup and draw the forth button
+	m_buttonText.setString("exit");
+	m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
+	m_buttonText.setPosition(BUTTON_EXIT_POSITION);
+	m_buttonSprite.setPosition(BUTTON_EXIT_POSITION);
+	t_window.draw(m_buttonSprite);
+	t_window.draw(m_buttonText);
+}
+
+/// <summary>
+/// Draw the help screen text and buttons.
+/// </summary>
+/// <param name="t_window">Render window</param>
+void Screens::drawHelpScreen(sf::RenderWindow & t_window)
+{
+	m_renderSquare.setFillColor(sf::Color{ 0,0,0,150 }); // Set the render square to transparent black to cover the background
+	t_window.draw(m_renderSquare); // Draw the render square
+
+	// Draw the menu button
+	m_buttonText.setString("menu");
+	m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
+	m_buttonText.setPosition(BUTTON_MENU_POSITION);
+	m_buttonSprite.setPosition(BUTTON_MENU_POSITION);
+	t_window.draw(m_buttonSprite);
+	t_window.draw(m_buttonText);
+	t_window.draw(m_helpText);
+
+	// Draw the next button
+	m_buttonText.setString("next");
+	m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
+	m_buttonText.setPosition(BUTTON_NEXT_POSITION);
+	m_buttonSprite.setPosition(BUTTON_NEXT_POSITION);
+	t_window.draw(m_buttonSprite);
+	t_window.draw(m_buttonText);
+}
+
+/// <summary>
+/// Draw the name screen text.
+/// </summary>
+/// <param name="t_window">Render window</param>
+/// <param name="t_playerName">Players name</param>
+void Screens::drawNameScreen(sf::RenderWindow & t_window, std::string t_playerName)
+{
+	m_nameText.setString(t_playerName); // Draw the player's current name
+	m_nameText.setOrigin(static_cast<float>(m_nameText.getGlobalBounds().width / 2), static_cast<float>(m_nameText.getGlobalBounds().height / 1.5));
+	t_window.draw(m_nameText); // Draw the name text
+	t_window.draw(m_enterNameText); // Draw the current name
+}
+
+/// <summary>
+/// Draw the character screen character and buttons.
+/// </summary>
+/// <param name="t_window">Render window</param>
+/// <param name="t_player">Player name</param>
+void Screens::drawCharacterScreen(sf::RenderWindow & t_window, Player &t_player)
+{
+	//Setup and draw the left arrow sprite
+	m_arrowSprite.setScale(1.0f, 1.0f);
+	m_arrowSprite.setPosition(static_cast<float>(WINDOW_WIDTH / 2 - 150), static_cast<float>(WINDOW_HEIGHT / 2));
+	t_window.draw(m_arrowSprite);
+
+	//Setup and draw the right arrow sprite
+	m_arrowSprite.setScale(-1.0f, 1.0f);
+	m_arrowSprite.setPosition(static_cast<float>(WINDOW_WIDTH / 2 + 150), static_cast<float>(WINDOW_HEIGHT / 2));
+	t_window.draw(m_arrowSprite);
+	t_window.draw(t_player.getBody()); // Draw the player character
 }
 
 /// <summary>
@@ -404,11 +472,9 @@ void Screens::draw(sf::RenderWindow & t_window, GameState t_gameState, std::stri
 /// <param name="t_window">Render window</param>
 void Screens::drawPauseScreen(sf::RenderWindow &t_window)
 {
-	sf::RectangleShape renderSquare;
-	renderSquare.setSize({ static_cast<float>(WINDOW_WIDTH),static_cast<float>(WINDOW_HEIGHT) });
-	renderSquare.setFillColor(sf::Color{ 255,255,255,100 });
-	t_window.draw(renderSquare);
-	t_window.draw(m_pauseText);
+	m_renderSquare.setFillColor(sf::Color{ 255,255,255,100 }); // Set the render square to transparent black to cover the background
+	t_window.draw(m_renderSquare); // Draw the render square
+	t_window.draw(m_pauseText); // Draw the pause text
 }
 
 /// <summary>
@@ -417,9 +483,9 @@ void Screens::drawPauseScreen(sf::RenderWindow &t_window)
 /// <param name="t_window">Render window</param>
 void Screens::drawEndScreen(sf::RenderWindow & t_window, std::string t_playerName, int t_playerScore, int t_playerCharNum, Player t_player)
 {
-	if (!m_scoreboardUpdated)
+	if (!m_scoreboardUpdated) // Only run once when the end screen is entered
 	{
-		saveScoreToFile(t_playerName, t_playerScore, t_playerCharNum);
+		saveScoreToFile(t_playerName, t_playerScore, t_playerCharNum); // Save and update the scoreboard
 		m_scoreboardUpdated = true;
 	}
 	
@@ -439,7 +505,7 @@ void Screens::drawEndScreen(sf::RenderWindow & t_window, std::string t_playerNam
 	t_window.draw(m_scoreboardText);
 	m_scoreboardText.setFillColor(sf::Color::White);
 
-	drawScoreboard(t_window, t_player);
+	drawScoreboard(t_window, t_player); // Draw the scoreboard
 
 	// Setup and display the button
 	m_buttonText.setString("menu");
@@ -459,31 +525,43 @@ void Screens::drawScoreboard(sf::RenderWindow & t_window, Player t_player)
 {
 	for (int i = 0; i < MAX_PLAYERS; i++) // Loop through all players in the scoreboard and display them
 	{
-		t_player.setPosition({ SCOREBOARD_POSITION.x, SCOREBOARD_POSITION.y + (i * 50) + 16 });
-		t_player.setCharacter(m_characterNums[i]);
-		t_window.draw(t_player.getBody());
+		t_player.setPosition({ SCOREBOARD_POSITION.x, SCOREBOARD_POSITION.y + (i * 50) + 16 }); // Set the player position
+		t_player.setCharacter(m_characterNums[i]); // Set the character of the player
+		t_window.draw(t_player.getBody()); // Draw the player character
 
-		m_scoreboardText.setPosition(SCOREBOARD_POSITION.x + 50, SCOREBOARD_POSITION.y + (i * 50));
-		m_scoreboardText.setString(std::to_string(i + 1));
-		t_window.draw(m_scoreboardText);
-		m_scoreboardText.setPosition(SCOREBOARD_POSITION.x + 100.0f, SCOREBOARD_POSITION.y + (i * 50));
-		m_scoreboardText.setString(m_names[i]);
-		t_window.draw(m_scoreboardText);
-		m_scoreboardText.setPosition(SCOREBOARD_POSITION.x + 250.0f, SCOREBOARD_POSITION.y + (i * 50));
-		m_scoreboardText.setString(std::to_string(m_scores[i]));
-		t_window.draw(m_scoreboardText);
+		m_scoreboardText.setPosition(SCOREBOARD_POSITION.x + 50, SCOREBOARD_POSITION.y + (i * 50)); // Set the text position for the player number
+		m_scoreboardText.setString(std::to_string(i + 1)); // Set the player number string
+		t_window.draw(m_scoreboardText); // Draw the player number
+		m_scoreboardText.setPosition(SCOREBOARD_POSITION.x + 100.0f, SCOREBOARD_POSITION.y + (i * 50)); // Set the text position for the player name
+		m_scoreboardText.setString(m_names[i]); // Set the name string
+		t_window.draw(m_scoreboardText); // Draw the name
+		m_scoreboardText.setPosition(SCOREBOARD_POSITION.x + 250.0f, SCOREBOARD_POSITION.y + (i * 50)); // Set the position of the text for the score
+		m_scoreboardText.setString(std::to_string(m_scores[i])); // Set the score text
+		t_window.draw(m_scoreboardText); // Draw the score
 	}
 }
 
 void Screens::drawScoreboardScreen(sf::RenderWindow & t_window, Player t_player)
 {
-	if (!m_scoreboardUpdated)
+	if (!m_scoreboardUpdated) // Only run once when the scoreboard screen is entered
 	{
-		readScore();
-		m_scoreboardUpdated = true;
+		readScore(); // Read the score from file
+		m_renderSquare.setFillColor(sf::Color{ 0,0,0,150 }); // Set the background render square colour to block background
+		m_scoreboardUpdated = true; // Set bool to true to avoid reading from file multiple times
 	}
 
-	drawScoreboard(t_window, t_player);
+	t_window.draw(m_backgroundSprite); // Draw the background
+	t_window.draw(m_renderSquare); // Draw a transparent layor to somewhat hide background
+
+	drawScoreboard(t_window, t_player); // Draw the scoreboard
+
+	// Setup and display the menu button
+	m_buttonText.setString("menu");
+	m_buttonText.setOrigin(static_cast<float>(m_buttonText.getGlobalBounds().width / 2), static_cast<float>(m_buttonText.getGlobalBounds().height));
+	m_buttonText.setPosition(BUTTON_MENU_POSITION);
+	m_buttonSprite.setPosition(BUTTON_MENU_POSITION);
+	t_window.draw(m_buttonSprite);
+	t_window.draw(m_buttonText);
 }
 
 /// <summary>

@@ -8,9 +8,6 @@
 /// Estimated time to finish: 30h
 /// Aprox time taken: 25h 
 /// -----------------------------------
-/// Issues/To-Do:
-/// - Scoreboard button needed on main menu
-/// - Add win condition
 
 #ifdef _DEBUG 
 #pragma comment(lib,"sfml-graphics-d.lib") 
